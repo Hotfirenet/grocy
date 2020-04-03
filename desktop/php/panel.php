@@ -18,10 +18,10 @@ if (config::byKey('scan_mode', 'grocy', 0) == 1) {
 } else {
 	echo '<div id="div_grocyScanAlert"></div>';
 }
-
+//$products = json_decode( grocy::searchBarcodeInOpenFoodFactsDB( '3564700283776' ), true );
 ?> 
-<div class="row row-overflow">
-   <div class="col-xs-12 eqLogicThumbnailDisplay">
+<div class="row">
+   <div class="col-xs-12">
  <?php
 
 if( config::byKey('scan_mode', 'grocy', 0) == 1 ) { ?>
@@ -36,7 +36,12 @@ if( config::byKey('scan_mode', 'grocy', 0) == 1 ) { ?>
 		| <a class="btn btn-danger btn-sm" id="bt_supAllProducts" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Supprimer tous les produits</a>
 
 	</div>
+	<?php echo '<div class="row"><pre>'; print_r($products); echo '</pre></div>'; ?>
 </div>
 <?php
+
+
+
+
 
 include_file('desktop', 'panel', 'js', 'grocy');?>

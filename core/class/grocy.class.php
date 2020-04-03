@@ -103,34 +103,39 @@ class grocy extends eqLogic {
 
         } else {
 
-            // $product = self::searchBarcodeInOpenFoodFactsDB( $_barcode );
+            if( config::byKey( 'scan_type', 'grocy' ) == 'JGROCY-A') {
 
-            // log::add('grocy','debug','scanProduct > searchBarcodeInOpenFoodFactsDB: ' . print_r( $product, true )  );
+                $product = json_decode( self::searchBarcodeInOpenFoodFactsDB( $_barcode ), true );
 
-            // $eqLogic = new grocy();
-            // $eqLogic->setName( $product['name'] );
-            // $eqLogic->setEqType_name( 'grocy' );
-            // $eqLogic->setLogicalId( $logicalId );
-            // $eqLogic->setObject_id( self::mapJeeObjectByLocationId( $product['location_id'] ) );
-            // $eqLogic->setConfiguration('id_product', $product['id'] );
-            // $eqLogic->setConfiguration('barcode', $product['barcode'] );
-            // $eqLogic->setConfiguration('id_stock', $product['qu_id_stock'] );
-            // // TODO $eqLogic->setConfiguration('image', $this->getImage());
-            // $eqLogic->setIsEnable(1);
-            // $eqLogic->setIsVisible('0');
-            // $eqLogic->setDisplay('icon', '<i class="fas fa-minus"></i>');
-            // $eqLogic->save();
+                log::add('grocy','debug','scanProduct > searchBarcodeInOpenFoodFactsDB: ' . print_r( $product, true )  );
 
-            // self::createCmd( $eqLogic->getId(), 'add1', 'action', 'Ajouter', 'other', '1', '<i class="fas fa-plus"></i>' );
-            // self::createCmd( $eqLogic->getId(), 'minus1', 'action', 'Enlever', 'other', '1', '<i class="fas fa-minus"></i>');                           
-            // self::createCmd( $eqLogic->getId(), 'stock', 'stock', 'Stock actuel', 'numeric', '1', 'line' );
-            // self::createCmd( $eqLogic->getId(), 'stock-terme', 'stock', 'Stock a terme', 'numeric', '1', 'line' );
-            // self::createCmd( $eqLogic->getId(), 'stock-scan', 'stock', 'Quantité scanné', 'numeric', '1', 'line' );
-     
-            return true;
+                if( $product['status'] == 1 ) {
+
+                    $logicalId = 'grocy-'.$product['code'];
+                    $eqLogic = new grocy();
+                    $eqLogic->setName( $product['product_name'] );
+                    $eqLogic->setEqType_name( 'grocy' );
+                    $eqLogic->setLogicalId( $logicalId );
+                    $eqLogic->setConfiguration('id_product', '0' );
+                    $eqLogic->setConfiguration('barcode', $product['code'] );
+                    $eqLogic->setConfiguration('id_stock', '0' );
+                    $eqLogic->setConfiguration('openfoodfacts', $product );
+                    $eqLogic->setIsEnable(1);
+                    $eqLogic->setIsVisible('0');
+                    $eqLogic->save();
+    
+                    self::createCmd( $eqLogic->getId(), 'add1', 'action', 'Ajouter', 'other', '1', '<i class="fas fa-plus"></i>' );
+                    self::createCmd( $eqLogic->getId(), 'minus1', 'action', 'Enlever', 'other', '1', '<i class="fas fa-minus"></i>');                           
+                    self::createCmd( $eqLogic->getId(), 'stock', 'stock', 'Stock actuel', 'numeric', '1', 'line' );
+                    self::createCmd( $eqLogic->getId(), 'stock-terme', 'stock', 'Stock a terme', 'numeric', '1', 'line' );
+                    self::createCmd( $eqLogic->getId(), 'stock-scan', 'stock', 'Quantité scanné', 'numeric', '1', 'line' );
+    
+                    return true;
+                } else {
+                    return false;
+                }
+            }      
         }
-
-  
 
         return false;
     }
@@ -362,7 +367,7 @@ class grocy extends eqLogic {
     }
 
     private function createCmd( $_eqLogic_id, $_logicalId, $_type, $_name, $_subtype, $_visible, $_template, $_quantity = null ) {
-        $cmd = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic_id, $_id);
+        $cmd = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic_id, $_logicalId );
         if (!is_object($cmd)) {
             log::add('grocy', 'debug', 'Création de la commande ' . $_logicalId);
 
@@ -460,6 +465,33 @@ class grocy extends eqLogic {
 
             log::add('grocy', 'debug', 'termeStock : ' . $termeStock );
         }
+    }
+
+    private function searchBarcodeInOpenFoodFactsDB( $_barcode ) {
+
+        if( empty( $_barcode ) ) {
+            $msg = __('Erreur: Aucun code barre', __FILE__);
+            log::add('grocy','debug', $msg );
+            return json_encode( array( 'error' => $msg ) );
+        }
+            
+        $url = "https://world.openfoodfacts.org/api/v0/product/" . $_barcode . ".json";
+    
+        try {
+    
+            $request_http = new com_http( $url);
+            return $request_http->exec(30); 
+            
+        } catch (\Throwable $th) {
+    
+            $msg = __('Erreur: ', __FILE__);
+            log::add('grocy','debug', $msg . $th );
+            return json_encode( array( 'error' => $msg ) );
+        }
+    
+        $msg = __('Erreur: Aucun produit trouvé avec ce code barre', __FILE__);
+        log::add('grocy','debug', $msg . $th );
+        return json_encode( array( 'error' => $msg ) );
     }
 
     private function demonScan() {
