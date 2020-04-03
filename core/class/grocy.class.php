@@ -105,11 +105,13 @@ class grocy extends eqLogic {
 
             if( config::byKey( 'scan_type', 'grocy' ) == 'JGROCY-A') {
 
-                $product = json_decode( self::searchBarcodeInOpenFoodFactsDB( $_barcode ), true );
+                $result = json_decode( self::searchBarcodeInOpenFoodFactsDB( $_barcode ), true );
 
-                log::add('grocy','debug','scanProduct > searchBarcodeInOpenFoodFactsDB: ' . print_r( $product, true )  );
+                log::add('grocy','debug','scanProduct > searchBarcodeInOpenFoodFactsDB: ' . print_r( $result, true )  );
 
-                if( $product['status'] == 1 ) {
+                if( $result['status'] == 1 ) {
+
+                    $product = $result['product'];
 
                     $logicalId = 'grocy-'.$product['code'];
                     $eqLogic = new grocy();
@@ -467,7 +469,7 @@ class grocy extends eqLogic {
         }
     }
 
-    private function searchBarcodeInOpenFoodFactsDB( $_barcode ) {
+    public static function searchBarcodeInOpenFoodFactsDB( $_barcode ) {
 
         if( empty( $_barcode ) ) {
             $msg = __('Erreur: Aucun code barre', __FILE__);
@@ -477,6 +479,8 @@ class grocy extends eqLogic {
             
         $url = "https://world.openfoodfacts.org/api/v0/product/" . $_barcode . ".json";
     
+        log::add('grocy','debug', $url );
+
         try {
     
             $request_http = new com_http( $url);
