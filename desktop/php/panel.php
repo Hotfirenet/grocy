@@ -18,16 +18,30 @@ if (config::byKey('scan_mode', 'grocy', 0) == 1) {
 } else {
 	echo '<div id="div_grocyScanAlert"></div>';
 }
+//$products = json_decode( grocy::searchBarcodeInOpenFoodFactsDB( '3564700283776' ), true );
+?> 
+<div class="row">
+   <div class="col-xs-12">
+ <?php
 
 if( config::byKey('scan_mode', 'grocy', 0) == 1 ) { ?>
-    <a class="btn btn-danger btn-sm togglePlugin" id="bt_stopScanMode" style="position:relative;top:-2px;"><i class="fas fa-times"></i> {{Désactiver}}</a>
+    	<a class="btn btn-danger btn-sm togglePlugin" id="bt_stopScanMode" style="position:relative;top:-2px;"><i class="fas fa-times"></i> {{Désactiver}}</a>
 <?php } else  { ?>
-	<a class="btn btn-success btn-sm bt_startScanMode" data-mode="A" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Activer le mode achat</a> |
-	<a class="btn btn-success btn-sm bt_startScanMode" data-mode="C" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Activer le mode consommation</a> | 
-	<a class="btn btn-success btn-sm bt_startScanMode" data-mode="O" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Activer le mode ouverture</a>
+		<a class="btn btn-success btn-sm bt_startScanMode" data-mode="A" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Activer le mode achat</a> |
+		<a class="btn btn-success btn-sm bt_startScanMode" data-mode="C" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Activer le mode consommation</a> | 
+		<a class="btn btn-success btn-sm bt_startScanMode" data-mode="O" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Activer le mode ouverture</a>
 <?php } ?>
 
-	| <a class="btn btn-success btn-sm" id="bt_inventaire" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Inventaire</a>
+		| <a class="btn btn-success btn-sm" id="bt_inventaire" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Inventaire</a>
+		| <a class="btn btn-danger btn-sm" id="bt_supAllProducts" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Supprimer tous les produits</a>
+
+	</div>
+	<?php echo '<div class="row"><pre>'; print_r($products); echo '</pre></div>'; ?>
+</div>
 <?php
+
+
+
+
 
 include_file('desktop', 'panel', 'js', 'grocy');?>

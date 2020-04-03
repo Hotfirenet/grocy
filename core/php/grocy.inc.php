@@ -23,30 +23,3 @@ define('MESSAGE_MODE', array(
     'JGROCY-C' => __('Grocy: Passage en mode consommation', __FILE__),
     'JGROCY-O' => __('Grocy: Passage en mode ouverture', __FILE__),
 ));
-
-function searchBarcodeInOpenFoodFactsDB( $barcode ) {
-
-    if( empty( $barcode ) ) {
-        $msg = __('Erreur: Aucun code barre', __FILE__);
-        log::add('grocy','debug', $msg );
-        return json_encode( array( 'error' => $msg ) );
-    }
-        
-    $url = "https://world.openfoodfacts.org/api/v0/product/" . $barcode . ".json";
-
-    try {
-
-        $request_http = new com_http( $url);
-        return $request_http->exec(30); 
-        
-    } catch (\Throwable $th) {
-
-        $msg = __('Erreur: ', __FILE__);
-        log::add('grocy','debug', $msg . $th );
-        return json_encode( array( 'error' => $msg ) );
-    }
-
-    $msg = __('Erreur: Aucun produit trouvé avec ce code barre', __FILE__);
-    log::add('grocy','debug', $msg . $th );
-    return json_encode( array( 'error' => $msg ) );
-}

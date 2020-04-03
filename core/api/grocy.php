@@ -27,7 +27,7 @@ if( empty( $barCode ) ) {
 
 log::add('grocy','debug','code barre scanné: ' . $barCode );
 
-if (config::byKey('scan_mode', 'grocy') == 0) {
+if (config::byKey( 'scan_mode', 'grocy' ) == 0) {
 
     switch ( $barCode ) {
         //Mode scan 
@@ -56,7 +56,7 @@ if (config::byKey('scan_mode', 'grocy') == 0) {
     }
 
     returnMsg( 'error', __('Type de code barre inconnu pour le passage en mode scan', __FILE__) );
-} elseif (config::byKey('scan_mode', 'grocy', 0) == 1) {
+} elseif ( config::byKey( 'scan_mode', 'grocy' ) == 1) {
 
     if( in_array( $barCode, $scan_mode ) ) {
         returnMsg( 'error', __('Vous êtes déjà en mode scan !', __FILE__) );
