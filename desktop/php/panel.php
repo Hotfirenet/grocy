@@ -13,8 +13,8 @@ require_once __DIR__  . '/../../core/php/grocy.inc.php';
 //     header('location: ' . config::byKey('grocy_url','grocy') );
 // }
 
-if (config::byKey('scan_mode', 'grocy', 0) == 1) {
-	echo '<div class="alert jqAlert alert-warning" id="div_grocyScanAlert" style="padding : 7px 35px 7px 15px;">{{Vous êtes en mode scan. Recliquez sur le bouton scan pour sortir de ce mode}}</div>';
+if ( config::byKey('scan_mode', 'grocy') == 1 ) {
+	echo '<div class="alert jqAlert alert-warning" id="div_grocyScanAlert" style="padding : 7px 35px 7px 15px;">{{Vous êtes en mode scan de type}} ' . config::byKey('scan_type', 'grocy'). '{{. Recliquez sur le bouton scan pour sortir de ce mode}}</div>';
 } else {
 	echo '<div id="div_grocyScanAlert"></div>';
 }
@@ -38,9 +38,5 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) { ?>
 	</div>
 </div>
 <?php
-
-log::add('grocy','debug', $url );
-
-
 
 include_file('desktop', 'panel', 'js', 'grocy');?>
