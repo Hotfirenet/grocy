@@ -61,9 +61,17 @@ try {
 
     if( init('action') == 'syncGrocy') {
         if( grocy::syncGrocy() ) {
-            ajax::success();
+            ajax::success( __('Tâche effectuée.', __FILE__) );
         } else {
             ajax::error( __('Erreur lors de la création des emplacements, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'supAllProducts') {
+        if( grocy::supAllProducts() ) {
+            ajax::success();
+        } else {
+            ajax::error( __('Erreur lors de la suppression des produits, voir les logs.', __FILE__) );
         }
     }
 

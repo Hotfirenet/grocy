@@ -93,13 +93,19 @@ class grocy extends eqLogic {
 
             log::add('grocy','debug','scanProduct > ' . $count . ' eqLogic trouvé'  );
 
+            $op = config::byKey('scan_type', 'grocy') == 'JGROCY-A' ? 1 : 0;
+
             foreach ( $eqLogics as $eqLogic ) {
-                self::newStock( $eqLogic->getId(), 1, 1 );
+                self::newStock( $eqLogic->getId(), $op, 1 );
             }
 
             return true;
 
         } else {
+
+            // $product = self::searchBarcodeInOpenFoodFactsDB( $_barcode );
+
+            // log::add('grocy','debug','scanProduct > searchBarcodeInOpenFoodFactsDB: ' . print_r( $product, true )  );
 
             // $eqLogic = new grocy();
             // $eqLogic->setName( $product['name'] );
@@ -160,6 +166,16 @@ class grocy extends eqLogic {
 
     public static function syncStock() {
 
+    }
+
+    public static function supAllProducts() {
+        $grocy = plugin::byId('grocy');
+        $eqLogics = eqLogic::byType( $grocy->getId() );
+
+        foreach ( $eqLogics as $eqLogic ) {
+            $eqLogic->remove();
+        }
+        return true;
     }
 
 

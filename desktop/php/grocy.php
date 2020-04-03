@@ -31,6 +31,11 @@ if (config::byKey('scan_mode', 'grocy', 0) == 1) {
         <br>
         <span>{{Configuration}}</span>
     </div>
+    <div class="cursor eqLogicAction logoSecondary" data-action="supAllProducts">
+        <i class="fas fa-trash-alt"></i>
+        <br>
+        <span>{{Suppression des produits}}</span>
+    </div>
   </div>
   <legend><i class="fas fa-table"></i> Grocy</legend>
 	   <input class="form-control" placeholder="{{Rechercher}}" id="in_searchEqlogic" />
