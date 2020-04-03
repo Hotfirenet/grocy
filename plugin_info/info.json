@@ -11,12 +11,12 @@
 	"maxDependancyInstallTime" : 0,
 	"eventjs" : true,
 	"changelog" : "https://hotfirenet.github.io/jeedom_docs/plugins/grocy/changelog/",
-	"documentation" : "https://hotfirenet.github.io/jeedom_docs/plugins/grocy/",
+	"documentation" : "https://hotfirenet.github.io/jeedom_docs/plugins/grocy/fr_FR/",
 	"link" : {
 		"forum":"https://community.jeedom.com/tag/plugin-grocy",
 		"video" : "Lien vers une video"
 	},
-	"language" : ["fr_FR","en_US","de_DE","sp_SP","ru_RU","id_ID","it_IT"],
+	"language" : ["fr_FR","en_US","sp_SP"],
 	"display" : "panel",
 	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile"]
 }
