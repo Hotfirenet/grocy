@@ -20,6 +20,20 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function grocy_install() {
     
+    $scanModeType = array( 
+        'JGROCY-A',
+        'JGROCY-C',
+        'JGROCY-O'
+    );
+
+    $msgScanModeType = array(
+        'JGROCY-A' => __('Grocy: Passage en mode achat', __FILE__),
+        'JGROCY-C' => __('Grocy: Passage en mode consommation', __FILE__),
+        'JGROCY-O' => __('Grocy: Passage en mode ouverture', __FILE__),
+    );
+
+    config::save('scanModeType'   , $scanModeType   , 'grocy');
+    config::save('msgScanModeType', $msgScanModeType, 'grocy');
 }
 
 function grocy_update() {
@@ -28,7 +42,9 @@ function grocy_update() {
 
 
 function grocy_remove() {
-    
+
+    config::remove('scanModeType'   , 'grocy');
+    config::remove('msgScanModeType', 'grocy');
 }
 
 

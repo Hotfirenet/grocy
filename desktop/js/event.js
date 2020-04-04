@@ -9,5 +9,10 @@ $('body').on('grocy::change', function (_event,_options) {
 $('body').on('grocy::scanState', function (_event,_options) {
 
     $('#div_alert').showAlert({message: _options.msg, level: 'warning'});
+
+    var params = new window.URLSearchParams(window.location.search);
+    if( params.get('p') == 'panel' ) {
+        location.reload();
+    }
     return;
 });

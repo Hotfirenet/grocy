@@ -19,7 +19,9 @@
 try {
     require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
     include_file('core', 'authentification', 'php');
-    include_file('core', 'grocy.inc', 'php', 'grocy');
+    
+    $scanModeType    = config::byKey( 'scanModeType'   , 'grocy' );
+    $msgScanModeType = config::byKey( 'msgScanModeType', 'grocy' );
 
     if (!isConnect('admin')) {
         throw new Exception(__('401 - Accès non autorisé', __FILE__));
@@ -44,7 +46,7 @@ try {
    
     if( init('action') == 'startScanMode') {
         $type = init('type');
-        if( grocy::startScanMode( 'scan', $type, MESSAGE_MODE['JGROCY-A'] ) ) { 
+        if( grocy::startScanMode( 'scan', $type, $msgScanModeType['JGROCY-A'] ) ) {
             ajax::success();
         } else {
             ajax::error('Erreur de connexion');

@@ -1,7 +1,6 @@
 <?php
 header('Content-type: application/json');
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
-include_file('core', 'grocy.inc', 'php', 'grocy');
 
 function returnMsg( $_type, $_msg ) {
     log::add('grocy','debug','ip: ' . network::getClientIp() . ' msg:' . $_msg );
@@ -14,51 +13,49 @@ if (!jeedom::apiAccess(init('apikey'), 'grocy')) {
     returnMsg( 'error', __('Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action (Grocy)', __FILE__) );
 }
 
-$barCode = init('text');
-$scan_mode = array( 
-    'JGROCY-A',
-    'JGROCY-C',
-    'JGROCY-O'
-);
+$barCode         = init('text');
+$scanModeType    = config::byKey( 'scanModeType'   , 'grocy' );
+$msgScanModeType = config::byKey( 'msgScanModeType', 'grocy' );
 
 if( empty( $barCode ) ) {
     returnMsg( 'error', __('Erreur lors de la transmission du code barre', __FILE__) );
 }
 
 log::add('grocy','debug','code barre scanné: ' . $barCode );
+log::add('grocy','debug','scanModeType: ' . print_r( $scanModeType, true ) );
 
 if (config::byKey( 'scan_mode', 'grocy' ) == 0) {
 
     switch ( $barCode ) {
         //Mode scan 
-        case $scan_mode[0]:
+        case $scanModeType[0]:
 
-            grocy::startScanMode( 'scan', 'JGROCY-A', MESSAGE_MODE[$scan_mode[0]] );
+            grocy::startScanMode( 'scan', 'JGROCY-A', $msgScanModeType[$scanModeType[0]] );
 
             returnMsg( 'state', 'succes' );
             break;
 
         //mode scan consommation
-        case $scan_mode[1]:
+        case $scanModeType[1]:
         
-            grocy::startScanMode( 'scan', 'JGROCY-C', MESSAGE_MODE[$scan_mode[1]] );
+            grocy::startScanMode( 'scan', 'JGROCY-C', $msgScanModeType[$scanModeType[1]] );
 
             returnMsg( 'state', 'succes' );
             break;
             
         //Mode ouverture
-        case $scan_mode[2]:
+        case $scanModeType[2]:
 
-            grocy::startScanMode( 'scan', 'JGROCY-O', MESSAGE_MODE[$scan_mode[2]] );
+            grocy::startScanMode( 'scan', 'JGROCY-O', $msgScanModeType[$scanModeType[2]] );
 
             returnMsg( 'state', 'succes' );
             break;
     }
 
     returnMsg( 'error', __('Type de code barre inconnu pour le passage en mode scan', __FILE__) );
-} elseif ( config::byKey( 'scan_mode', 'grocy' ) == 1) {
+} elseif ( config::byKey( 'scanModeType', 'grocy' ) == 1) {
 
-    if( in_array( $barCode, $scan_mode ) ) {
+    if( in_array( $barCode, $scanModeType ) ) {
         returnMsg( 'error', __('Vous êtes déjà en mode scan !', __FILE__) );
     }
     

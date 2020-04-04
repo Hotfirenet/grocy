@@ -19,9 +19,11 @@ if ( config::byKey('scan_mode', 'grocy') == 1 ) {
 	echo '<div id="div_grocyScanAlert"></div>';
 }
 //$product = json_decode( grocy::searchBarcodeInOpenFoodFactsDB( '3564700283776' ), true );
+
+$msgScanModeType = config::byKey( 'msgScanModeType', 'grocy' );
 ?> 
 <div class="row">
-   <div class="col-xs-12" style="padding:20px 5px">
+	<div class="col-xs-12" style="padding:20px 5px">
  <?php
 
 if( config::byKey('scan_mode', 'grocy') == 1 ) { ?>
@@ -41,6 +43,9 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) { ?>
    <div class="col-xs-4 text-center bt_startScanMode" data-mode="A"><img src="plugins/grocy/data/images/modes/JGROCY-A.png" title="{{Mode de scan: Achat}}" alt="JGROCY-A"></div>
    <div class="col-xs-4 text-center bt_startScanMode" data-mode="C"><img src="plugins/grocy/data/images/modes/JGROCY-C.png" title="{{Mode de scan: Consomation}}" alt="JGROCY-C"></div>
    <div class="col-xs-4 text-center bt_startScanMode" data-mode="O"><img src="plugins/grocy/data/images/modes/JGROCY-O.png" title="{{Mode de scan: Ouverture}}" alt="JGROCY-O"></div>
+</div>
+<div class="row" style="background-color: white">
+	<pre><?php  ?></pre>
 </div>
 <?php
 

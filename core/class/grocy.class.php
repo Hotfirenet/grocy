@@ -43,35 +43,31 @@ class grocy extends eqLogic {
         return $result;
     }
     
-    public static function startScanMode( $stateMode, $stateType, $msg ) {
+    public static function startScanMode( $_stateMode, $_stateType, $_msg ) {
 
-        if (config::byKey('scan_mode', 'grocy') == 0) {
+        if ( config::byKey('scan_mode', 'grocy') == 0 ) {
 
             config::save('scan_mode', 1, 'grocy');  
             log::add('grocy','debug','scan_mode: 1' );
 
-            config::save('scan_type', $stateType, 'grocy');  
-            log::add('grocy','debug','scan_type: ' . $stateType );
+            config::save('scan_type', $_stateType, 'grocy');  
+            log::add('grocy','debug','scan_type: ' . $_stateType );
 
             $scanState = array(
-                'mode'  => $stateMode,
-                'type'  => $stateType,
+                'mode'  => $_stateMode,
+                'type'  => $_stateType,
                 'state' => 1,
-                'msg'   => $msg . ', <a href="index.php?v=d&m=grocy&p=panel">Acceder à la page</a>'
+                'msg'   => $_msg . ', <a href="index.php?v=d&m=grocy&p=panel">'  .__('Acceder à la page', __FILE__) . '</a>'
             );
             event::add('grocy::scanState', $scanState );
             log::add('grocy','debug','grocy::scanState: ' . print_r( $scanState, true ) );
 
-            $cmd = cmd::byString( config::byKey('grocy_notif_cmd', 'grocy', 0) ); 
-            if ( is_object( $cmd ) ) {
-                $cmd->execCmd( $options = array( 'title' => 'Jeedom' , 'message' => $msg ), $cache = 0);
-                log::add('grocy','debug','Notif message: ' . $msg );
-                return true;
-            } else {
-                log::add('grocy','warning', 'Aucune commande de notfication trouvée' );
-                return false;
-            }
+            return self::sendNotification( $_msg );
+
         } else {
+
+
+
             log::add('grocy','warning', 'Vous êtes déjà dans un mode de scan' );
             return false;
         }
@@ -81,6 +77,7 @@ class grocy extends eqLogic {
 
         config::save('scan_mode', 0, 'grocy'); 
         config::save('scan_type', '', 'grocy');
+        config::save('scan_products', '', 'grocy');
         log::add('grocy','debug','Désactivation du mode scan' );
         return true;
     }
@@ -121,6 +118,7 @@ class grocy extends eqLogic {
                     $eqLogic->setConfiguration('id_product', '0' );
                     $eqLogic->setConfiguration('barcode', $product['code'] );
                     $eqLogic->setConfiguration('id_stock', '0' );
+                    $eqLogic->setConfiguration('tmp', '1' );
                     $eqLogic->setConfiguration('openfoodfacts', $product );
                     $eqLogic->setIsEnable(1);
                     $eqLogic->setIsVisible('0');
@@ -183,6 +181,10 @@ class grocy extends eqLogic {
             $eqLogic->remove();
         }
         return true;
+    }
+
+    public static function pull($_option) {
+
     }
 
 
@@ -469,7 +471,7 @@ class grocy extends eqLogic {
         }
     }
 
-    public static function searchBarcodeInOpenFoodFactsDB( $_barcode ) {
+    private static function searchBarcodeInOpenFoodFactsDB( $_barcode ) {
 
         if( empty( $_barcode ) ) {
             $msg = __('Erreur: Aucun code barre', __FILE__);
@@ -496,6 +498,19 @@ class grocy extends eqLogic {
         $msg = __('Erreur: Aucun produit trouvé avec ce code barre', __FILE__);
         log::add('grocy','debug', $msg . $th );
         return json_encode( array( 'error' => $msg ) );
+    }
+
+    private static function sendNotification( $_msg ) {
+
+        $cmd = cmd::byString( config::byKey('grocy_notif_cmd', 'grocy') ); 
+        if ( is_object( $cmd ) ) {
+            $cmd->execCmd( $options = array( 'title' => 'Jeedom' , 'message' => $_msg ), $cache = 0);
+            log::add('grocy','debug','Notif message: ' . $_msg );
+            return true;
+        } else {
+            log::add('grocy','warning', 'Aucune commande de notfication trouvée' );
+            return false;
+        }
     }
 
     private function demonScan() {

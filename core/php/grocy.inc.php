@@ -18,8 +18,5 @@
 
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
-define('MESSAGE_MODE', array(
-    'JGROCY-A' => __('Grocy: Passage en mode achat', __FILE__),
-    'JGROCY-C' => __('Grocy: Passage en mode consommation', __FILE__),
-    'JGROCY-O' => __('Grocy: Passage en mode ouverture', __FILE__),
-));
+$scanModeType    = config::byKey( 'scanModeType'   , 'grocy' );
+$msgScanModeType = config::byKey( 'msgScanModeType', 'grocy' );
