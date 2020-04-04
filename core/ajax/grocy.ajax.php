@@ -46,7 +46,7 @@ try {
    
     if( init('action') == 'startScanMode') {
         $type = init('type');
-        if( grocy::startScanMode( 'scan', $type, $msgScanModeType['JGROCY-A'] ) ) {
+        if( grocy::startScanMode( 'scan', $type ) ) {
             ajax::success();
         } else {
             ajax::error('Erreur de connexion');

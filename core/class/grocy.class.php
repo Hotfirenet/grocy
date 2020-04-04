@@ -43,34 +43,48 @@ class grocy extends eqLogic {
         return $result;
     }
     
-    public static function startScanMode( $_stateMode, $_stateType, $_msg ) {
+    public static function startScanMode( $_stateMode, $_stateType ) {
 
+
+        log::add('grocy','info', 'startScanMode ' . $_stateType );
         if ( config::byKey('scan_mode', 'grocy') == 0 ) {
 
-            config::save('scan_mode', 1, 'grocy');  
-            log::add('grocy','debug','scan_mode: 1' );
-
-            config::save('scan_type', $_stateType, 'grocy');  
-            log::add('grocy','debug','scan_type: ' . $_stateType );
-
-            $scanState = array(
-                'mode'  => $_stateMode,
-                'type'  => $_stateType,
-                'state' => 1,
-                'msg'   => $_msg . ', <a href="index.php?v=d&m=grocy&p=panel">'  .__('Acceder à la page', __FILE__) . '</a>'
-            );
-            event::add('grocy::scanState', $scanState );
-            log::add('grocy','debug','grocy::scanState: ' . print_r( $scanState, true ) );
-
-            return self::sendNotification( $_msg );
+            return self::doToStartScanMode( $_stateMode, $_stateType );
 
         } else {
 
+            if( config::byKey( 'scan_type', 'grocy' ) == $_stateType ) {
 
+                log::add('grocy','info', 'Vous êtes déjà dans le mode de scan ' . $_stateType );
+                return false;                
+            }
 
-            log::add('grocy','warning', 'Vous êtes déjà dans un mode de scan' );
+            log::add('grocy','info', 'Before checkModeScan: ' . $_stateType );
+            if( self::checkModeScan( $_stateType ) ) {
+                log::add('grocy','info', 'In checkModeScan: ' . $_stateType );
+                return self::doToStartScanMode( $_stateMode, $_stateType );
+            }
+ 
+            log::add('grocy','info', 'Vous êtes déjà dans un mode de scan de type Achat il faut désactiver le mode' );
             return false;
         }
+    }
+
+    public static function checkModeScan( $_stateType ) {
+
+        $scanModeType = config::byKey( 'scanModeType'   , 'grocy' );
+        unset( $scanModeType[0] );
+
+        log::add('grocy','debug', 'checkModeScan: ' .print_r( $scanModeType, true ) );
+        log::add('grocy','debug', 'checkModeScan stateType: ' .print_r( $_stateType, true ) );
+
+        if( in_array( $_stateType, $scanModeType ) ) { 
+
+            log::add('grocy','debug', 'checkModeScan Ok: ' );
+            return true;
+        }
+
+        return false;
     }
 
     public static function stopScanMode() {
@@ -181,10 +195,6 @@ class grocy extends eqLogic {
             $eqLogic->remove();
         }
         return true;
-    }
-
-    public static function pull($_option) {
-
     }
 
 
@@ -471,7 +481,7 @@ class grocy extends eqLogic {
         }
     }
 
-    private static function searchBarcodeInOpenFoodFactsDB( $_barcode ) {
+    private function searchBarcodeInOpenFoodFactsDB( $_barcode ) {
 
         if( empty( $_barcode ) ) {
             $msg = __('Erreur: Aucun code barre', __FILE__);
@@ -500,7 +510,29 @@ class grocy extends eqLogic {
         return json_encode( array( 'error' => $msg ) );
     }
 
-    private static function sendNotification( $_msg ) {
+    private function doToStartScanMode( $_stateMode, $_stateType ) {
+
+        config::save('scan_mode', 1, 'grocy');  
+        log::add('grocy','debug','scan_mode: 1' );
+
+        config::save('scan_type', $_stateType, 'grocy');  
+        log::add('grocy','debug','scan_type: ' . $_stateType );
+
+        $msgScanModeType = config::byKey( 'msgScanModeType', 'grocy' );
+
+        $scanState = array(
+            'mode'  => $_stateMode,
+            'type'  => $_stateType,
+            'state' => 1,
+            'msg'   => $msgScanModeType[$_stateType] . ', <a href="index.php?v=d&m=grocy&p=panel">'  .__('Acceder à la page', __FILE__) . '</a>'
+        );
+        event::add('grocy::scanState', $scanState );
+        log::add('grocy','debug','grocy::scanState: ' . print_r( $scanState, true ) );
+
+        return self::sendNotification( $msgScanModeType[$_stateType] );
+    }
+
+    private function sendNotification( $_msg ) {
 
         $cmd = cmd::byString( config::byKey('grocy_notif_cmd', 'grocy') ); 
         if ( is_object( $cmd ) ) {

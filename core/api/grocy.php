@@ -15,7 +15,6 @@ if (!jeedom::apiAccess(init('apikey'), 'grocy')) {
 
 $barCode         = init('text');
 $scanModeType    = config::byKey( 'scanModeType'   , 'grocy' );
-$msgScanModeType = config::byKey( 'msgScanModeType', 'grocy' );
 
 if( empty( $barCode ) ) {
     returnMsg( 'error', __('Erreur lors de la transmission du code barre', __FILE__) );
@@ -24,13 +23,13 @@ if( empty( $barCode ) ) {
 log::add('grocy','debug','code barre scanné: ' . $barCode );
 log::add('grocy','debug','scanModeType: ' . print_r( $scanModeType, true ) );
 
-if (config::byKey( 'scan_mode', 'grocy' ) == 0) {
+if ( in_array( $barCode, $scanModeType ) ) {
 
     switch ( $barCode ) {
         //Mode scan 
         case $scanModeType[0]:
 
-            grocy::startScanMode( 'scan', 'JGROCY-A', $msgScanModeType[$scanModeType[0]] );
+            grocy::startScanMode( 'scan', 'JGROCY-A' );
 
             returnMsg( 'state', 'succes' );
             break;
@@ -38,7 +37,7 @@ if (config::byKey( 'scan_mode', 'grocy' ) == 0) {
         //mode scan consommation
         case $scanModeType[1]:
         
-            grocy::startScanMode( 'scan', 'JGROCY-C', $msgScanModeType[$scanModeType[1]] );
+            grocy::startScanMode( 'scan', 'JGROCY-C' );
 
             returnMsg( 'state', 'succes' );
             break;
@@ -46,7 +45,7 @@ if (config::byKey( 'scan_mode', 'grocy' ) == 0) {
         //Mode ouverture
         case $scanModeType[2]:
 
-            grocy::startScanMode( 'scan', 'JGROCY-O', $msgScanModeType[$scanModeType[2]] );
+            grocy::startScanMode( 'scan', 'JGROCY-O' );
 
             returnMsg( 'state', 'succes' );
             break;
