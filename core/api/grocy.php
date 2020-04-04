@@ -52,17 +52,10 @@ if ( in_array( $barCode, $scanModeType ) ) {
     }
 
     returnMsg( 'error', __('Type de code barre inconnu pour le passage en mode scan', __FILE__) );
-} elseif ( config::byKey( 'scanModeType', 'grocy' ) == 1) {
+} 
 
-    if( in_array( $barCode, $scanModeType ) ) {
-        returnMsg( 'error', __('Vous êtes déjà en mode scan !', __FILE__) );
-    }
-    
-    if( grocy::scanProduct( $barCode ) ) {
-        returnMsg( 'state', 'succes' );
-    } else {
-        returnMsg( 'error', __('Erreur a definir !', __FILE__) );
-    }
+if( grocy::scanProduct( $barCode ) ) {
+    returnMsg( 'state', 'succes' );
+} else {
+    returnMsg( 'error', __('Erreur a definir !', __FILE__) );
 }
-
-returnMsg( 'error', __('Erreur inconnue!', __FILE__) );
