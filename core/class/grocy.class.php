@@ -45,7 +45,6 @@ class grocy extends eqLogic {
     
     public static function startScanMode( $_stateMode, $_stateType ) {
 
-
         log::add('grocy','info', 'startScanMode ' . $_stateType );
         if ( config::byKey('scan_mode', 'grocy') == 0 ) {
 
@@ -53,30 +52,31 @@ class grocy extends eqLogic {
 
         } else {
 
-            if( config::byKey( 'scan_type', 'grocy' ) == $_stateType ) {
-
-                log::add('grocy','info', 'Vous êtes déjà dans le mode de scan ' . $_stateType );
-                return false;                
-            }
-
-            log::add('grocy','info', 'Before checkModeScan: ' . $_stateType );
             if( self::checkModeScan( $_stateType ) ) {
-                log::add('grocy','info', 'In checkModeScan: ' . $_stateType );
+
                 return self::doToStartScanMode( $_stateMode, $_stateType );
             }
  
-            log::add('grocy','info', 'Vous êtes déjà dans un mode de scan de type Achat il faut désactiver le mode' );
+            log::add('grocy','info', 'Vous êtes déjà dans un mode de scan de type Achat.' );
             return false;
         }
     }
 
     public static function checkModeScan( $_stateType ) {
 
+        $currentScanType = config::byKey( 'scan_type', 'grocy' );
+
+        if( $_stateType == 'JGROCY-A' || $currentScanType == 'JGROCY-A' ) 
+            return false;
+
+        if( $scan_type == $_stateType ) {
+
+            log::add('grocy','info', 'Vous êtes déjà dans le mode de scan ' . $_stateType );
+            return false;                
+        }
+
         $scanModeType = config::byKey( 'scanModeType'   , 'grocy' );
         unset( $scanModeType[0] );
-
-        log::add('grocy','debug', 'checkModeScan: ' .print_r( $scanModeType, true ) );
-        log::add('grocy','debug', 'checkModeScan stateType: ' .print_r( $_stateType, true ) );
 
         if( in_array( $_stateType, $scanModeType ) ) { 
 
