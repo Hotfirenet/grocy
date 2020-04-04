@@ -37,10 +37,10 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) { ?>
 
 	</div>
 </div>
-<div class="row">
-   <div class="col-xs-4"><img src="plugins/grocy/data/images/modes/JGROCY-A.png" title="{{Mode de scan: Achat}}" alt="JGROCY-A"></div>
-   <div class="col-xs-4"><img src="plugins/grocy/data/images/modes/JGROCY-C.png" title="{{Mode de scan: Consomation}}" alt="JGROCY-C"></div>
-   <div class="col-xs-4"><img src="plugins/grocy/data/images/modes/JGROCY-O.png" title="{{Mode de scan: Ouverture}}" alt="JGROCY-O"></div>
+<div class="row" style="background-color: white">
+   <div class="col-xs-4 text-center bt_startScanMode" data-mode="A"><img src="plugins/grocy/data/images/modes/JGROCY-A.png" title="{{Mode de scan: Achat}}" alt="JGROCY-A"></div>
+   <div class="col-xs-4 text-center bt_startScanMode" data-mode="C"><img src="plugins/grocy/data/images/modes/JGROCY-C.png" title="{{Mode de scan: Consomation}}" alt="JGROCY-C"></div>
+   <div class="col-xs-4 text-center bt_startScanMode" data-mode="O"><img src="plugins/grocy/data/images/modes/JGROCY-O.png" title="{{Mode de scan: Ouverture}}" alt="JGROCY-O"></div>
 </div>
 <?php
 
