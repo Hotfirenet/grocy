@@ -21,7 +21,7 @@ if ( config::byKey('scan_mode', 'grocy') == 1 ) {
 //$product = json_decode( grocy::searchBarcodeInOpenFoodFactsDB( '3564700283776' ), true );
 ?> 
 <div class="row">
-   <div class="col-xs-12">
+   <div class="col-xs-12" style="padding:20px 5px">
  <?php
 
 if( config::byKey('scan_mode', 'grocy') == 1 ) { ?>
