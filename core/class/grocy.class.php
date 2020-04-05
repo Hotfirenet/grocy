@@ -32,7 +32,10 @@ class grocy extends eqLogic {
             if( config::byKey( 'scan_type', 'grocy' ) != 'JGROCY-A' ) {
                 $diff = time() - config::byKey( 'scan_latest_timestamp', 'grocy' );
                 log::add('grocy','debug', 'cron > diff: ' . $diff );
-                if( $diff >= config::byKey( 'grocy_time_mode', 'grocy' ) ) {
+                $myStopTime = config::byKey( 'grocy_time_mode', 'grocy' );
+                log::add('grocy','debug', 'cron > diff: ' . $diff . ' myStopTime ' . $myStopTime );
+                if( $diff >= $myStopTime ) {
+                    log::add('grocy','debug', 'Je stop le mode en cours.' );
                     self::stopScanMode();
                 }
             }

@@ -29,6 +29,7 @@ $buttonO         = '<a class="btn btn-success btn-sm bt_startScanMode" data-mode
 ?> 
 <div class="row">
 	<div class="col-xs-12" style="padding:20px 5px">
+	<a class="btn btn-success btn-sm" id="bt_instanceGrocy" style="position:relative;top:-2px;" href="<?php echo config::byKey('grocy_url', 'grocy'); ?>" target="_blank"><i class="fas fa-wrench"></i> {{Accéder à Grocy}}</a> | 
  <?php
 
 if( config::byKey('scan_mode', 'grocy') == 1 ) { 
