@@ -65,7 +65,7 @@ try {
         if( grocy::syncGrocy() ) {
             ajax::success( __('Tâche effectuée.', __FILE__) );
         } else {
-            ajax::error( __('Erreur lors de la création des emplacements, voir les logs.', __FILE__) );
+            ajax::error( __('Erreur lors de la synchronisation, voir les logs.', __FILE__) );
         }
     }
 
@@ -74,6 +74,14 @@ try {
             ajax::success();
         } else {
             ajax::error( __('Erreur lors de la suppression des produits, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'syncAllProductsStock') {
+        if( grocy::syncAllProductsStock() ) {
+            ajax::success();
+        } else {
+            ajax::error( __('Erreur lors de la synchronisation du stock des produits, voir les logs.', __FILE__) );
         }
     }
 

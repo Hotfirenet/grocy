@@ -203,14 +203,63 @@ class grocy extends eqLogic {
 
     public static function syncGrocy() {
         if( self::createLocationsInJeedom() ) {
-            return self::createProductsInJeedom();
+            if( self::createProductsInJeedom() ) {
+                return self::syncAllProductsStock();
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
     }
 
-    public static function syncStock() {
+    public static function syncAllProductsStock() {
+        
+        $url             = config::byKey('grocy_url','grocy');
+        $apikey          = config::byKey('grocy_apikey','grocy');
 
+        $http            = new grocyAPI($url, $apikey);
+        $resultProductsStock = $http->getAllProductsStock();
+
+        $setError = false;
+        if( is_json( $resultProductsStock ) ) {
+
+            $productsStock = json_decode( $resultProductsStock, true );
+
+            foreach ( $productsStock as $productStock ) {
+                
+                $searchEqLogic = eqLogic::byTypeAndSearhConfiguration('grocy','"product_id":"'.$productStock['product_id'].'"');
+                $eqLogic = $searchEqLogic[0];       
+
+                if ( is_object( $eqLogic ) ) {
+
+                    $currentStockCmd = grocyCmd::byEqLogicIdAndLogicalId( $eqLogic->getId(), 'stock' );
+
+                    if( is_object($currentStockCmd) ) {
+
+                        $currentStockCmd->event( $productStock['amount'] );
+
+                    } else {
+                        $setError = true;
+                        log::add('grocy','error','Commande stock introuvable pour le produit: ' . $eqLogic->getName()  );
+                    }
+
+                } else {
+                    $setError = true;
+                    log::add('grocy','warning','impossible de trouver le produit ayant pour identifiant Grocy: ' . $productStock['product_id'] );
+                }  
+            }
+
+            if( $setError == true ) 
+                return false;
+            else
+                return true;
+
+        } else {
+
+            log::add('grocy','error','syncAllProductsStock: ' . print_r( $resultProductsStock, true ) );
+            return false;
+        }
     }
 
     public static function supAllProducts() {
@@ -296,7 +345,7 @@ class grocy extends eqLogic {
                             'message' => __('Emplacement crèe avec succès : ', __FILE__) . $location['name'],
                         ));       
                         
-                        sleep(1);
+                        //sleep(1);
                     }        
                 }
 
@@ -366,7 +415,7 @@ class grocy extends eqLogic {
                                 $eqLogic->setEqType_name( 'grocy' );
                                 $eqLogic->setLogicalId( $logicalId );
                                 $eqLogic->setObject_id( self::mapJeeObjectByLocationId( $product['location_id'] ) );
-                                $eqLogic->setConfiguration('id_product', $product['id'] );
+                                $eqLogic->setConfiguration('product_id', $product['id'] );
                                 $eqLogic->setConfiguration('barcode', $product['barcode'] );
                                 $eqLogic->setConfiguration('id_stock', $product['qu_id_stock'] );
                                 // TODO $eqLogic->setConfiguration('image', $this->getImage());
@@ -389,7 +438,7 @@ class grocy extends eqLogic {
 
                                 log::add('grocy','debug','eqLogic: ' . print_r( $eqLogic, true ) );
 
-                                sleep(1);
+                                //sleep(1);
                             }
                         }
 
@@ -472,7 +521,7 @@ class grocy extends eqLogic {
         $this->newStock( $this->getId(), 0, $_value );
     }
 
-    public function newStock( $_eqLogic, $_op, $_value ) {
+    private function newStock( $_eqLogic, $_op, $_value ) {
 
         self::setTimestamp();    
 

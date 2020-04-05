@@ -36,7 +36,7 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 
 	$stateType = config::byKey( 'scan_type', 'grocy' );
 
-	if( grocy::checkModeScan( $stateType ) ) {
+	if( $stateType == 'JGROCY-C' || $stateType == 'JGROCY-O' ) {
 
 		if( $stateType == 'JGROCY-C' ) {
 			echo $buttonO . ' | ';

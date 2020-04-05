@@ -7,15 +7,16 @@
 
 class grocyAPI {
 
-    private $url                = string;
-    private $apikey             = string;
+    private $url                = '';
+    private $apikey             = '';
 
     private $apiLocations       = 'api/objects/locations';
     private $apiProductGroups   = 'api/objects/product_groups';
     private $apiProducts        = 'api/objects/products';
-    private $apiShoppingList    = 'api/stock/shoppinglist/';
     private $apiChores          = 'api/objects/chores';
-    private $apiStock           = 'api/stock/products';
+    private $apiStock           = 'api/stock';
+    private $apiStockProduct    = 'api/stock/products/';
+    private $apiShoppingList    = 'api/stock/shoppinglist/';
     private $apiChoresExex      = 'api/chores/';
     private $apiSystemInfo      = 'api/system/info';
     
@@ -46,10 +47,14 @@ class grocyAPI {
         return $this->sendCommand( $url );       
     }
 
-
     public function getProducts() {
         $url = $this->url . $this->apiProducts;
         return $this->sendCommand( $url );       
+    }
+
+    public function getAllProductsStock() {
+        $url = $this->url . $this->apiStock;
+        return $this->sendCommand( $url );           
     }
 
     private function sendCommand($_url, $_method = 'GET', $_data = array() ) {
