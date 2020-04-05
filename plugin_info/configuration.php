@@ -57,6 +57,12 @@ if (!isConnect()) {
 				</div>
 			</div>
 		</div>
+		<div class="form-group">
+            <label class="col-lg-4 control-label">{{Temps actif du mode C ou O}}</label>
+            <div class="col-lg-8">
+                <input class="configKey form-control" data-l1key="grocy_time_mode" />
+            </div>
+        </div>
   </fieldset>
 </form>
 <?php 

@@ -34,10 +34,11 @@ function grocy_install() {
 
     config::save('scanModeType'   , $scanModeType   , 'grocy');
     config::save('msgScanModeType', $msgScanModeType, 'grocy');
+    config::save('grocy_time_mode', 120, 'grocy');
 }
 
 function grocy_update() {
-    
+    config::save('grocy_time_mode', 120, 'grocy');
 }
 
 

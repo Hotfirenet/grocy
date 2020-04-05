@@ -27,6 +27,18 @@ class grocy extends eqLogic {
 
     /*     * ***********************Methode static*************************** */
     
+	public static function cron() {
+		if ( config::byKey( 'scan_mode', 'grocy' ) == 1 ) {
+            if( config::byKey( 'scan_type', 'grocy' ) != 'JGROCY-A' ) {
+                $diff = time() - config::byKey( 'scan_latest_timestamp', 'grocy' );
+                log::add('grocy','debug', 'cron > diff: ' . $diff );
+                if( $diff >= config::byKey( 'grocy_time_mode', 'grocy' ) ) {
+                    self::stopScanMode();
+                }
+            }
+        }
+    }
+    
 	public static function cron15() {
 		log::add('grocy','debug','Mise à jour des infos');
 
@@ -45,7 +57,7 @@ class grocy extends eqLogic {
     
     public static function startScanMode( $_stateMode, $_stateType ) {
 
-        log::add('grocy','debug', 'startScanMode ' . $_stateType );
+        log::add('grocy','debug','Demande de passage en mode: ' . $_stateType );
         if ( config::byKey('scan_mode', 'grocy') == 0 ) {
 
             return self::doToStartScanMode( $_stateMode, $_stateType );
@@ -57,7 +69,6 @@ class grocy extends eqLogic {
                 return self::doToStartScanMode( $_stateMode, $_stateType );
             }
  
-            log::add('grocy','info', 'Vous êtes déjà dans un mode de scan de type Achat.' );
             return false;
         }
     }
@@ -66,8 +77,11 @@ class grocy extends eqLogic {
 
         $currentScanType = config::byKey( 'scan_type', 'grocy' );
 
-        if( $_stateType == 'JGROCY-A' || $currentScanType == 'JGROCY-A' ) 
+        if( $_stateType == 'JGROCY-A' || $currentScanType == 'JGROCY-A' ) {
+
+            log::add('grocy','info', 'Vous ne pouvez pas basculer du mode ' . $currentScanType . ' vers le mode ' . $_stateType );
             return false;
+        }
 
         if( $scan_type == $_stateType ) {
 
@@ -75,15 +89,16 @@ class grocy extends eqLogic {
             return false;                
         }
 
-        $scanModeType = config::byKey( 'scanModeType'   , 'grocy' );
+        $scanModeType = config::byKey( 'scanModeType', 'grocy' );
         unset( $scanModeType[0] );
 
         if( in_array( $_stateType, $scanModeType ) ) { 
 
-            log::add('grocy','debug', 'checkModeScan Ok: ' );
+            log::add('grocy','debug', 'Validation de switcher du mode ' . $currentScanType . ' au mode ' . $_stateType );
             return true;
         }
 
+        log::add('grocy','info', 'Vous ne pouvez pas basculer du mode ' . $currentScanType . ' vers le mode ' . $_stateType );
         return false;
     }
 
@@ -535,10 +550,9 @@ class grocy extends eqLogic {
         self::setTimestamp();
 
         config::save('scan_mode', 1, 'grocy');  
-        log::add('grocy','debug','scan_mode: 1' );
 
         config::save('scan_type', $_stateType, 'grocy');  
-        log::add('grocy','debug','scan_type: ' . $_stateType );
+        log::add('grocy','debug','Passage en mode: ' . $_stateType );
 
         $msgScanModeType = config::byKey( 'msgScanModeType', 'grocy' );
 
@@ -549,7 +563,6 @@ class grocy extends eqLogic {
             'msg'   => $msgScanModeType[$_stateType] . ', <a href="index.php?v=d&m=grocy&p=panel">'  .__('Acceder à la page', __FILE__) . '</a>'
         );
         event::add('grocy::scanState', $scanState );
-        log::add('grocy','debug','grocy::scanState: ' . print_r( $scanState, true ) );
 
         return self::sendNotification( $msgScanModeType[$_stateType] );
     }

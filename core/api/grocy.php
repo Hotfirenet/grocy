@@ -3,7 +3,10 @@ header('Content-type: application/json');
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 
 function returnMsg( $_type, $_msg ) {
-    log::add('grocy','debug','ip: ' . network::getClientIp() . ' msg:' . $_msg );
+
+    if( $_type == 'error' )
+        log::add('grocy','debug','ip: ' . network::getClientIp() . ' msg:' . $_msg );
+        
     $msg[$_type] = $_msg;
     echo json_encode($msg);
 	die();
@@ -21,7 +24,6 @@ if( empty( $barCode ) ) {
 }
 
 log::add('grocy','debug','code barre scanné: ' . $barCode );
-log::add('grocy','debug','scanModeType: ' . print_r( $scanModeType, true ) );
 
 if ( in_array( $barCode, $scanModeType ) ) {
 
