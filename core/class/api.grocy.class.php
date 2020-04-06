@@ -7,18 +7,19 @@
 
 class grocyAPI {
 
-    private $url                = '';
-    private $apikey             = '';
+    private $url                    = '';
+    private $apikey                 = '';
 
-    private $apiLocations       = 'api/objects/locations';
-    private $apiProductGroups   = 'api/objects/product_groups';
-    private $apiProducts        = 'api/objects/products';
-    private $apiChores          = 'api/objects/chores';
-    private $apiStock           = 'api/stock';
-    private $apiStockProduct    = 'api/stock/products/';
-    private $apiShoppingList    = 'api/stock/shoppinglist/';
-    private $apiChoresExex      = 'api/chores/';
-    private $apiSystemInfo      = 'api/system/info';
+    private $apiLocations           = 'api/objects/locations';
+    private $apiProductGroups       = 'api/objects/product_groups';
+    private $apiProducts            = 'api/objects/products';
+    private $apiChores              = 'api/objects/chores';
+    private $apiStock               = 'api/stock';
+    private $apiStockProductAdd     = 'api/stock/products/%d/add';
+    private $apiStockProductConsume = 'api/stock/products/%d/consume';
+    private $apiShoppingList        = 'api/stock/shoppinglist/';
+    private $apiChoresExex          = 'api/chores/';
+    private $apiSystemInfo          = 'api/system/info';
     
     private $apiGrocyMinVersion = "2.5.1";
 
@@ -57,7 +58,28 @@ class grocyAPI {
         return $this->sendCommand( $url );           
     }
 
+    public function purchaseProduct( $_data ) {
+
+        $apiStockProductAdd = sprintf( $this->apiStockProductAdd, $_data['product_id'] );      
+        $url = $this->url . $apiStockProductAdd;
+
+        unset( $_data['product_id'] );
+
+        return $this->sendCommand( $url, 'POST', $_data );         
+    }
+
+    public function consumeProduct( $_data ) {
+
+        $apiStockProductConsume = sprintf( $this->apiStockProductConsume, $_data['product_id'] );      
+        $url = $this->url . $apiStockProductConsume;
+
+        unset( $_data['product_id'] );
+
+        return $this->sendCommand( $url, 'POST', $_data );         
+    }
+
     private function sendCommand($_url, $_method = 'GET', $_data = array() ) {
+
         try {
             $request_http = new com_http( $_url );
 
@@ -68,13 +90,14 @@ class grocyAPI {
 
             switch ( $_method ) {
                 case 'POST':
-                    array_push( $headerArray, 'Content-Length: ' . strlen( $_data ) );
-                    $request_http->setPost( json_encode( $_data ) );
+                    $data = json_encode( $_data );
+                    array_push( $headerArray, 'Content-Length: ' . strlen( $data ) );
+                    $request_http->setPost( $data );
                     break;
             }
             $request_http->setHeader( $headerArray );
 
-            log::add('grocy','debug','checkGrocyInstance: ' . print_r( $_url, true ) );
+            log::add('grocy','debug','checkGrocyInstance: ' . print_r( $request_http, true ) );
 
             return $request_http->exec(30); 
         } catch (\Throwable $th) {

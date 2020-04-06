@@ -513,12 +513,12 @@ class grocy extends eqLogic {
 
     public function addStock( $_value ) {
         log::add('grocy', 'debug', 'addStock : ' . $_value);
-        $this->newStock( $this->getId(), 1, $_value );
+        $this->newStock( $this, 1, $_value );
     }
 
     public function rmStock( $_value ) {
         log::add('grocy', 'debug', 'rmStock : ' . $_value );
-        $this->newStock( $this->getId(), 0, $_value );
+        $this->newStock( $this, 0, $_value );
     }
 
     private function newStock( $_eqLogic, $_op, $_value ) {
@@ -527,16 +527,23 @@ class grocy extends eqLogic {
 
         log::add('grocy', 'debug', 'op: ' . $_op . ' value: ' . $_value );
 
-        $jScanStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic, 'stock-scan' );
+        $jScanStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock-scan' );
         if( is_object($jScanStock) ) {
 
             $ssValue = $jScanStock->execCmd();
             $value = (int)$_value ;
 
+            $url             = config::byKey('grocy_url','grocy');
+            $apikey          = config::byKey('grocy_apikey','grocy');
+    
+            $http            = new grocyAPI($url, $apikey);
+
             if ($_op) {
                 $scanStock = $ssValue + $value;
+                $result = $http->purchaseProduct( array( 'product_id' => $_eqLogic->getConfiguration( 'product_id' ), 'amount' => $value ) );
             } else {
                 $scanStock = $ssValue - $value;
+                $result = $http->consumeProduct( array( 'product_id' => $_eqLogic->getConfiguration( 'product_id' ), 'amount' => $value ) );
             }
 
             $jscanStock = $scanStock >= 0 ? $scanStock : 0;
@@ -546,10 +553,11 @@ class grocy extends eqLogic {
             log::add('grocy', 'debug', 'scanStock : ' . $jscanStock );
         }
 
-        $jTermeStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic, 'stock-terme' );
+        $jTermeStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock-terme' );
+        log::add('grocy', 'debug', 'addStock : ' . print_r($jTermeStock,true ) );
         if( is_object($jTermeStock) ) {
 
-            $jStock     = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic, 'stock' );
+            $jStock     = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock' );
             $stockValue = $jStock->execCmd();
 
             $termeStock = $stockValue + $jscanStock;
