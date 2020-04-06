@@ -43,7 +43,9 @@ class grocy extends eqLogic {
     }
     
 	public static function cron15() {
-		log::add('grocy','debug','Mise à jour des infos');
+        log::add('grocy','debug','Mise à jour des infos');
+        
+        self::syncAllProductsStock();
 
 	}
 
@@ -554,7 +556,6 @@ class grocy extends eqLogic {
         }
 
         $jTermeStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock-terme' );
-        log::add('grocy', 'debug', 'addStock : ' . print_r($jTermeStock,true ) );
         if( is_object($jTermeStock) ) {
 
             $jStock     = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock' );
