@@ -526,11 +526,12 @@ class grocy extends eqLogic {
         $stockValue      = 0;
         $scanStockValue  = 0;
         $termeStockValue = 0;   
+        $eqLogicId       = $_eqLogic->getId();
 
         log::add('grocy', 'debug', 'op: ' . $_op . ' value: ' . $_value );
 
         $ok = false;
-        $jStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock' );
+        $jStock = grocyCmd::byEqLogicIdAndLogicalId( $eqLogicId, 'stock' );
         if( is_object($jStock) ) {
 
             $stockValue = $jStock->execCmd();
@@ -539,14 +540,14 @@ class grocy extends eqLogic {
 
             if( $_eqLogic->getConfiguration('tmp') == 0 ) {
 
-                $jScanStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock-scan' );
+                $jScanStock = grocyCmd::byEqLogicIdAndLogicalId( $eqLogicId, 'stock-scan' );
                 if( is_object($jScanStock) ) {
         
                     $scanStockValue = $jScanStock->execCmd();
         
                     log::add('grocy', 'debug', 'scanStock : ' . $scanStockValue );
         
-                    $jTermeStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock-terme' );
+                    $jTermeStock = grocyCmd::byEqLogicIdAndLogicalId( $eqLogicId, 'stock-terme' );
                     if( is_object($jTermeStock) ) {
             
                         $termeStockValue = $jTermeStock->execCmd();
@@ -584,7 +585,10 @@ class grocy extends eqLogic {
             if( $isTmpProduct ) {
 
                 $tmpQueue = config::byKey('grocy_tmp_queue','grocy');
-                //check if is in tmp queue 
+                if ( ! in_array( $eqLogicId, $tmpQueue ) ) {
+                    $tmpQueue[] = $eqLogicId;
+                }
+                config::save('tmp_queue' , $tmpQueue, 'grocy');
 
             } else {
 
