@@ -54,7 +54,12 @@ function grocy_remove() {
     config::remove('type_mod_sync'     , 'grocy');
     config::remove('tmp_queue'         , 'grocy');
 
+    $grocy = plugin::byId('grocy');
+    $eqLogics = eqLogic::byType($plugin->grocy());
 
+    foreach ($eqLogics as $eqLogic) {
+        $eqLogic->remove();
+    }
 }
 
 
