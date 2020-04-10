@@ -147,6 +147,7 @@ class grocy extends eqLogic {
                         self::startScanMode( 'scan', 'JGROCY-C');
                     }
         
+                    self::setTimestamp(); 
                     $op = config::byKey('scan_type', 'grocy') == 'JGROCY-A' ? 1 : 0;
                 }
 
@@ -524,9 +525,7 @@ class grocy extends eqLogic {
 
         $stockValue      = 0;
         $scanStockValue  = 0;
-        $termeStockValue = 0;
-
-        self::setTimestamp();    
+        $termeStockValue = 0;   
 
         log::add('grocy', 'debug', 'op: ' . $_op . ' value: ' . $_value );
 
