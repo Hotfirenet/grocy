@@ -119,24 +119,43 @@ class grocy extends eqLogic {
 
     public static function scanProduct( $_barcode ) {
 
+        $today = date("Y-m-d");
+
         $eqLogics = eqLogic::byTypeAndSearhConfiguration('grocy','"barcode":"'.$_barcode.'"');
 
         if( $count = count( $eqLogics ) > 0 ) {
 
             log::add('grocy','debug','scanProduct > ' . $count . ' eqLogic trouvé'  );
+
+            if( $count > 1 ) {
+
+                log::add('grocy','info','Plusieurs produits ont été trouvé avec ce code barre, il ne devrait y en avoir qu\'un.' );
+                return false;
+
+            } else {
+
+                $eqLogic = $eqLogics[0];
+
+                if( $eqLogic->getConfiguration('tmp') ) {
+
+                    $op = 1;
+
+                } else {
+
+                    if ( config::byKey( 'scan_mode', 'grocy' ) == 0 ) {
+
+                        self::startScanMode( 'scan', 'JGROCY-C');
+                    }
         
-            if ( config::byKey( 'scan_mode', 'grocy' ) == 0 ) {
+                    $op = config::byKey('scan_type', 'grocy') == 'JGROCY-A' ? 1 : 0;
+                }
 
-                self::startScanMode( 'scan', 'JGROCY-C');
+                return self::newStock( $eqLogic, $op, 1 );
+
             }
 
-            $op = config::byKey('scan_type', 'grocy') == 'JGROCY-A' ? 1 : 0;
-
-            foreach ( $eqLogics as $eqLogic ) {
-                self::newStock( $eqLogic->getId(), $op, 1 );
-            }
-
-            return true;
+            log::add('grocy','debug','Methode scanProduct: Erreur inconnu scan 1');
+            return false;
 
         } else {
 
@@ -166,7 +185,6 @@ class grocy extends eqLogic {
                 self::createCmd( $eqLogic->getId(), 'minus1', 'action', 'Enlever', 'other', '1', '<i class="fas fa-minus"></i>');                           
                 self::createCmd( $eqLogic->getId(), 'stock', 'stock', 'Stock actuel', 'numeric', '1', 'line' );
 
-                $today = date("Y-m-d");
                 log::add('grocy_'.$today,'info','Création du produit ' . $product['product_name'] . ' dans Jeedom' );
                 return true;
             } else {
@@ -174,31 +192,13 @@ class grocy extends eqLogic {
                 return false;
             }   
 
+            log::add('grocy','debug','Methode scanProduct: Erreur inconnu scan 2');
+            return false;
         }
 
+        log::add('grocy','debug','Methode scanProduct: Erreur inconnu scan 3');
         return false;
     }
-
-    // public static function templateFunction() {
-    //     $url             = config::byKey('grocy_url','grocy');
-    //     $apikey          = config::byKey('grocy_apikey','grocy');
-
-    //     $http            = new grocyAPI($url, $apikey);
-    //     $resultLocations = $http->getLocations();
-
-    //     if( is_json( $resultLocations ) ) {
-    //         $locations = json_decode( $resultLocations, true );
-    //         if( isset( $locations['error_message'] ) ) {
-    //             log::add('grocy','error','createLocationsInJeedom: ' . print_r( $resultLocations, true ) );
-    //             return false;
-    //         } else {
-
-    //         }
-    //     } else {
-    //         log::add('grocy','error','createLocationsInJeedom: ' . print_r( $resultLocations, true ) );
-    //         return false;
-    //     }        
-    // }
 
     public static function syncGrocy() {
         if( self::createLocationsInJeedom() ) {
