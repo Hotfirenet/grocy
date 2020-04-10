@@ -66,8 +66,8 @@ if (!isConnect()) {
 		<div class="form-group" style="display:none">
             <label class="col-lg-4 control-label">{{Mode temps réel ou différé}}</label>
             <div class="col-lg-8">
-				<label class="radio-inline"><input type="radio" name="rd_type_mod_sync" class="configKey" data-l1key="type_mod_sync" data-l2key="real"> {{Temps réel}}</label>
-				<label class="radio-inline"><input type="radio" name="rd_type_mod_sync" class="configKey" data-l1key="type_mod_sync" data-l2key="diff"> {{Différé}}</label>
+				<label class="radio-inline"><input type="radio" name="rd_type_mode_sync" class="configKey" data-l1key="type_mode_sync" data-l2key="real"> {{Temps réel}}</label>
+				<label class="radio-inline"><input type="radio" name="rd_type_mode_sync" class="configKey" data-l1key="type_mode_sync" data-l2key="diff"> {{Différé}}</label>
             </div>
         </div>
   </fieldset>

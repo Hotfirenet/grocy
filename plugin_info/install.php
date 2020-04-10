@@ -35,13 +35,13 @@ function grocy_install() {
     config::save('scan_mode_type'    , $scanModeType   , 'grocy');
     config::save('msg_scan_mode_type', $msgScanModeType, 'grocy');
     config::save('time_mode', 120    , 'grocy');
-    config::save('type_mod_sync'     , array( 'real' => 1, 'diff' => 0 ), 'grocy');
+    config::save('type_mode_sync'     , array( 'real' => 1, 'diff' => 0 ), 'grocy');
     config::save('tmp_queue'         , '' , 'grocy');
 }
 
 function grocy_update() {
     config::save('time_mode'      , 120, 'grocy');
-    config::save('type_mod_sync'  , array( 'real' => 1, 'diff' => 0 ), 'grocy');
+    config::save('type_mode_sync'  , array( 'real' => 1, 'diff' => 0 ), 'grocy');
     config::save('tmp_queue'      , '' , 'grocy');
 }
 
@@ -51,7 +51,7 @@ function grocy_remove() {
     config::remove('scanModeType'      , 'grocy');
     config::remove('msg_scan_mode_type', 'grocy');
     config::remove('time_mode'         , 'grocy');
-    config::remove('type_mod_sync'     , 'grocy');
+    config::remove('type_mode_sync'     , 'grocy');
     config::remove('tmp_queue'         , 'grocy');
 
     $grocy = plugin::byId('grocy');
