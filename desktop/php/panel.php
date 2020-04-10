@@ -20,7 +20,7 @@ if ( config::byKey('scan_mode', 'grocy') == 1 ) {
 }
 //$product = json_decode( grocy::searchBarcodeInOpenFoodFactsDB( '3564700283776' ), true );
 
-$msgScanModeType = config::byKey( 'msgScanModeType', 'grocy' );
+$msgScanModeType = config::byKey( 'msg_scan_mode_type', 'grocy' );
 $buttonStop      = '<a class="btn btn-danger btn-sm togglePlugin" id="bt_stopScanMode" style="position:relative;top:-2px;"><i class="fas fa-times"></i> {{Désactiver}}</a>';
 $buttonA         = '<a class="btn btn-success btn-sm bt_startScanMode" data-mode="A" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Activer le mode achat</a>';
 $buttonC         = '<a class="btn btn-success btn-sm bt_startScanMode" data-mode="C" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Activer le mode consommation</a>';

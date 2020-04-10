@@ -18,5 +18,5 @@
 
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
-$scanModeType    = config::byKey( 'scanModeType'   , 'grocy' );
-$msgScanModeType = config::byKey( 'msgScanModeType', 'grocy' );
+$scanModeType    = config::byKey( 'scan_mode_type'   , 'grocy' );
+$msgScanModeType = config::byKey( 'msg_scan_mode_type', 'grocy' );

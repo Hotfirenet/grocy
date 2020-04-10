@@ -20,8 +20,8 @@ try {
     require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
     include_file('core', 'authentification', 'php');
     
-    $scanModeType    = config::byKey( 'scanModeType'   , 'grocy' );
-    $msgScanModeType = config::byKey( 'msgScanModeType', 'grocy' );
+    $scanModeType    = config::byKey( 'scan_mode_type'   , 'grocy' );
+    $msgScanModeType = config::byKey( 'msg_scan_mode_type', 'grocy' );
 
     if (!isConnect('admin')) {
         throw new Exception(__('401 - Accès non autorisé', __FILE__));

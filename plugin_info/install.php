@@ -32,20 +32,29 @@ function grocy_install() {
         'JGROCY-O' => __('Grocy: Passage en mode ouverture', __FILE__),
     );
 
-    config::save('scanModeType'   , $scanModeType   , 'grocy');
-    config::save('msgScanModeType', $msgScanModeType, 'grocy');
-    config::save('grocy_time_mode', 120, 'grocy');
+    config::save('scan_mode_type'    , $scanModeType   , 'grocy');
+    config::save('msg_scan_mode_type', $msgScanModeType, 'grocy');
+    config::save('time_mode', 120    , 'grocy');
+    config::save('type_mod_sync'     , array( 'real' => 1, 'diff' => 0 ), 'grocy');
+    config::save('tmp_queue'         , '' , 'grocy');
 }
 
 function grocy_update() {
-    config::save('grocy_time_mode', 120, 'grocy');
+    config::save('time_mode'      , 120, 'grocy');
+    config::save('type_mod_sync'  , array( 'real' => 1, 'diff' => 0 ), 'grocy');
+    config::save('tmp_queue'      , '' , 'grocy');
 }
 
 
 function grocy_remove() {
 
-    config::remove('scanModeType'   , 'grocy');
-    config::remove('msgScanModeType', 'grocy');
+    config::remove('scanModeType'      , 'grocy');
+    config::remove('msg_scan_mode_type', 'grocy');
+    config::remove('time_mode'         , 'grocy');
+    config::remove('type_mod_sync'     , 'grocy');
+    config::remove('tmp_queue'         , 'grocy');
+
+
 }
 
 

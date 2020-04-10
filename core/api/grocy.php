@@ -17,7 +17,7 @@ if (!jeedom::apiAccess(init('apikey'), 'grocy')) {
 }
 
 $barCode         = init('text');
-$scanModeType    = config::byKey( 'scanModeType'   , 'grocy' );
+$scanModeType    = config::byKey( 'scan_mode_type'   , 'grocy' );
 
 if( empty( $barCode ) ) {
     returnMsg( 'error', __('Erreur lors de la transmission du code barre', __FILE__) );

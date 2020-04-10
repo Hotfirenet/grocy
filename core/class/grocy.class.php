@@ -32,7 +32,7 @@ class grocy extends eqLogic {
             if( config::byKey( 'scan_type', 'grocy' ) != 'JGROCY-A' ) {
                 $diff = time() - config::byKey( 'scan_latest_timestamp', 'grocy' );
                 log::add('grocy','debug', 'cron > diff: ' . $diff );
-                $myStopTime = config::byKey( 'grocy_time_mode', 'grocy' );
+                $myStopTime = config::byKey( 'time_mode', 'grocy' );
                 log::add('grocy','debug', 'cron > diff: ' . $diff . ' myStopTime ' . $myStopTime );
                 if( $diff >= $myStopTime ) {
                     log::add('grocy','debug', 'Je stop le mode en cours.' );
@@ -69,7 +69,7 @@ class grocy extends eqLogic {
 
         } else {
 
-            if( self::checkModeScan( $_stateType ) ) {
+            if( self::checkModeScan( $_stateMode, $_stateType ) ) {
 
                 return self::doToStartScanMode( $_stateMode, $_stateType );
             }
@@ -78,7 +78,7 @@ class grocy extends eqLogic {
         }
     }
 
-    public static function checkModeScan( $_stateType ) {
+    public static function checkModeScan( $_stateMode, $_stateType ) {
 
         $currentScanType = config::byKey( 'scan_type', 'grocy' );
 
@@ -94,7 +94,7 @@ class grocy extends eqLogic {
             return false;                
         }
 
-        $scanModeType = config::byKey( 'scanModeType', 'grocy' );
+        $scanModeType = config::byKey( 'scan_mode_type', 'grocy' );
         unset( $scanModeType[0] );
 
         if( in_array( $_stateType, $scanModeType ) ) { 
@@ -119,16 +119,16 @@ class grocy extends eqLogic {
 
     public static function scanProduct( $_barcode ) {
 
-        if ( config::byKey( 'scan_mode', 'grocy' ) == 0 ) {
-
-            self::startScanMode( 'scan', 'JGROCY-C');
-        }
-
         $eqLogics = eqLogic::byTypeAndSearhConfiguration('grocy','"barcode":"'.$_barcode.'"');
 
         if( $count = count( $eqLogics ) > 0 ) {
 
             log::add('grocy','debug','scanProduct > ' . $count . ' eqLogic trouvé'  );
+        
+            if ( config::byKey( 'scan_mode', 'grocy' ) == 0 ) {
+
+                self::startScanMode( 'scan', 'JGROCY-C');
+            }
 
             $op = config::byKey('scan_type', 'grocy') == 'JGROCY-A' ? 1 : 0;
 
@@ -140,45 +140,42 @@ class grocy extends eqLogic {
 
         } else {
 
-            //il y a un truc a revoir 
-            if( config::byKey( 'scan_type', 'grocy' ) == 'JGROCY-A') {
+            $result = json_decode( self::searchBarcodeInOpenFoodFactsDB( $_barcode ), true );
 
-                $result = json_decode( self::searchBarcodeInOpenFoodFactsDB( $_barcode ), true );
+            log::add('grocy','debug','scanProduct > searchBarcodeInOpenFoodFactsDB: ' . print_r( $result, true )  );
 
-                log::add('grocy','debug','scanProduct > searchBarcodeInOpenFoodFactsDB: ' . print_r( $result, true )  );
+            if( $result['status'] == 1 ) {
 
-                if( $result['status'] == 1 ) {
+                $product = $result['product'];
 
-                    $product = $result['product'];
+                $logicalId = 'grocy-'.$product['code'];
+                $eqLogic = new grocy();
+                $eqLogic->setName( $product['product_name'] );
+                $eqLogic->setEqType_name( 'grocy' );
+                $eqLogic->setLogicalId( $logicalId );
+                $eqLogic->setConfiguration('id_product', '0' );
+                $eqLogic->setConfiguration('barcode', $product['code'] );
+                $eqLogic->setConfiguration('id_stock', '0' );
+                $eqLogic->setConfiguration('tmp', '1' );
+                $eqLogic->setConfiguration('openfoodfacts', $product );
+                $eqLogic->setIsEnable(1);
+                $eqLogic->setIsVisible('0');
+                $eqLogic->save();
 
-                    $logicalId = 'grocy-'.$product['code'];
-                    $eqLogic = new grocy();
-                    $eqLogic->setName( $product['product_name'] );
-                    $eqLogic->setEqType_name( 'grocy' );
-                    $eqLogic->setLogicalId( $logicalId );
-                    $eqLogic->setConfiguration('id_product', '0' );
-                    $eqLogic->setConfiguration('barcode', $product['code'] );
-                    $eqLogic->setConfiguration('id_stock', '0' );
-                    $eqLogic->setConfiguration('tmp', '1' );
-                    $eqLogic->setConfiguration('openfoodfacts', $product );
-                    $eqLogic->setIsEnable(1);
-                    $eqLogic->setIsVisible('0');
-                    $eqLogic->save();
-    
-                    self::createCmd( $eqLogic->getId(), 'add1', 'action', 'Ajouter', 'other', '1', '<i class="fas fa-plus"></i>' );
-                    self::createCmd( $eqLogic->getId(), 'minus1', 'action', 'Enlever', 'other', '1', '<i class="fas fa-minus"></i>');                           
-                    self::createCmd( $eqLogic->getId(), 'stock', 'stock', 'Stock actuel', 'numeric', '1', 'line' );
-                    self::createCmd( $eqLogic->getId(), 'stock-terme', 'stock', 'Stock a terme', 'numeric', '1', 'line' );
-                    self::createCmd( $eqLogic->getId(), 'stock-scan', 'stock', 'Quantité scanné', 'numeric', '1', 'line' );
-    
-                    return true;
-                } else {
-                    return false;
-                }
-            }      
+                self::createCmd( $eqLogic->getId(), 'add1', 'action', 'Ajouter', 'other', '1', '<i class="fas fa-plus"></i>' );
+                self::createCmd( $eqLogic->getId(), 'minus1', 'action', 'Enlever', 'other', '1', '<i class="fas fa-minus"></i>');                           
+                self::createCmd( $eqLogic->getId(), 'stock', 'stock', 'Stock actuel', 'numeric', '1', 'line' );
+
+                $today = date("Y-m-d");
+                log::add('grocy_'.$today,'info','Création du produit ' . $product['product_name'] . ' dans Jeedom' );
+                return true;
+            } else {
+                log::add('grocy_'.$today,'info','Produit inconnu dans OpenFoodFacts! Merci de le créer à la main dans Grocy et synchroniser Jeedom' );
+                return false;
+            }   
+
         }
 
-        log::add('grocy','warning','Le produit scanné ne peut être crée en consommation ou ouverture' );
         return false;
     }
 
@@ -426,11 +423,11 @@ class grocy extends eqLogic {
                                 $eqLogic->setDisplay('icon', '<i class="fas fa-minus"></i>');
                                 $eqLogic->save();
 
-                                self::createCmd( $eqLogic->getId(), 'add1', 'action', 'Ajouter', 'other', '1', '<i class="fas fa-plus"></i>' );
-                                self::createCmd( $eqLogic->getId(), 'minus1', 'action', 'Enlever', 'other', '1', '<i class="fas fa-minus"></i>');                           
-                                self::createCmd( $eqLogic->getId(), 'stock', 'stock', 'Stock actuel', 'numeric', '1', 'line' );
-                                self::createCmd( $eqLogic->getId(), 'stock-terme', 'stock', 'Stock a terme', 'numeric', '1', 'line' );
-                                self::createCmd( $eqLogic->getId(), 'stock-scan', 'stock', 'Quantité scanné', 'numeric', '1', 'line' );
+                                self::createCmd( $eqLogic->getId(), 'add1', 'action', 'Ajouter', 'other', 0, '<i class="fas fa-plus"></i>' );
+                                self::createCmd( $eqLogic->getId(), 'minus1', 'action', 'Enlever', 'other', 1, '<i class="fas fa-minus"></i>');                           
+                                self::createCmd( $eqLogic->getId(), 'stock', 'stock', 'Stock actuel', 'numeric', 1, 'line' );
+                                self::createCmd( $eqLogic->getId(), 'stock-terme', 'stock', 'Stock a terme', 'numeric', 0, 'line' );
+                                self::createCmd( $eqLogic->getId(), 'stock-scan', 'stock', 'Quantité scanné', 'numeric', 0, 'line' );
 
                                 event::add('jeedom::alert', array(
                                     'level' => 'warning',
@@ -525,50 +522,96 @@ class grocy extends eqLogic {
 
     private function newStock( $_eqLogic, $_op, $_value ) {
 
+        $stockValue      = 0;
+        $scanStockValue  = 0;
+        $termeStockValue = 0;
+
         self::setTimestamp();    
 
         log::add('grocy', 'debug', 'op: ' . $_op . ' value: ' . $_value );
 
-        $jScanStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock-scan' );
-        if( is_object($jScanStock) ) {
+        $ok = false;
+        $jStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock' );
+        if( is_object($jStock) ) {
 
-            $ssValue = $jScanStock->execCmd();
-            $value = (int)$_value ;
-
-            $url             = config::byKey('grocy_url','grocy');
-            $apikey          = config::byKey('grocy_apikey','grocy');
-    
-            $http            = new grocyAPI($url, $apikey);
-
-            if ($_op) {
-                $scanStock = $ssValue + $value;
-                $result = $http->purchaseProduct( array( 'product_id' => $_eqLogic->getConfiguration( 'product_id' ), 'amount' => $value ) );
-            } else {
-                $scanStock = $ssValue - $value;
-                $result = $http->consumeProduct( array( 'product_id' => $_eqLogic->getConfiguration( 'product_id' ), 'amount' => $value ) );
-            }
-
-            $jscanStock = $scanStock >= 0 ? $scanStock : 0;
-
-            $jScanStock->event( $jscanStock );
-
-            log::add('grocy', 'debug', 'scanStock : ' . $jscanStock );
-        }
-
-        $jTermeStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock-terme' );
-        if( is_object($jTermeStock) ) {
-
-            $jStock     = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock' );
             $stockValue = $jStock->execCmd();
 
-            $termeStock = $stockValue + $jscanStock;
+            log::add('grocy', 'debug', 'stockValue : ' . $stockValue );
 
-            $jtermeStock = $termeStock >= 0 ? $termeStock : 0;
+            if( $_eqLogic->getConfiguration('tmp') == 0 ) {
 
-            $jTermeStock->event($jtermeStock);
+                $jScanStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock-scan' );
+                if( is_object($jScanStock) ) {
+        
+                    $scanStockValue = $jScanStock->execCmd();
+        
+                    log::add('grocy', 'debug', 'scanStock : ' . $scanStockValue );
+        
+                    $jTermeStock = grocyCmd::byEqLogicIdAndLogicalId( $_eqLogic->getId(), 'stock-terme' );
+                    if( is_object($jTermeStock) ) {
+            
+                        $termeStockValue = $jTermeStock->execCmd();
+        
+                        log::add('grocy', 'debug', 'termeStockValue : ' . $termeStockValue );
+                        $ok = true;
+                    }
+                }
 
-            log::add('grocy', 'debug', 'jtermeStock : ' . $jtermeStock );
+                $isTmpProduct = false;
+
+            } else {
+                $isTmpProduct = true;
+                $ok           = true;
+            }
+        }  
+
+        if( $ok ) {
+
+            $value   = (int)$_value ;
+
+            if  ( $_op ) {
+                $stock             = $stockValue + $value;
+                $scanStock         = $stockValue + $value;
+                $grocyMethodAction = 'purchaseProduct';
+            } else {
+                $stock             = $stockValue - $value;
+                $scanStock         = $stockValue - $value;
+                $grocyMethodAction = 'consumeProduct';
+            }
+
+            $stock = $stock >= 0 ? $stock : 0;
+            $jStock->event( $stock );
+
+            if( $isTmpProduct ) {
+
+                $tmpQueue = config::byKey('grocy_tmp_queue','grocy');
+                //check if is in tmp queue 
+
+            } else {
+
+                $scanStock = $scanStock >= 0 ? $scanStock : 0;
+                $jScanStock->event( $scanStock );
+
+                $termeStock = $stockValue + $scanStockValue;
+                $termeStock = $termeStock >= 0 ? $termeStock : 0;
+                $jTermeStock->event($termeStock);
+    
+                //TODO partie a revoir pour faire un truc jolie en terme de widget
+                $url    = config::byKey('grocy_url','grocy');
+                $apikey = config::byKey('grocy_apikey','grocy');
+    
+                $http   = new grocyAPI($url, $apikey);
+                $result = call_user_func_array(array( $http, $grocyMethodAction ), array( array( 'product_id' => $_eqLogic->getConfiguration( 'product_id' ), 'amount' => $value ) ));
+                log::add('grocy', 'debug', 'Result request: ' . print_r( $result, true ));
+            }
+
+            $today = date("Y-m-d");
+            $op = $_op == 1 ? ' add +' : ' rm -';
+            log::add('grocy_'.$today, 'info', print_r( $_eqLogic->getName(), true ) .' old stock: ' . $stockValue . ' ' . $op . ' ' . $value . ' New stock: ' . $stock  );
+            return true;
         }
+
+        return false;
     }
 
     private function searchBarcodeInOpenFoodFactsDB( $_barcode ) {
@@ -615,7 +658,7 @@ class grocy extends eqLogic {
         config::save('scan_type', $_stateType, 'grocy');  
         log::add('grocy','debug','Passage en mode: ' . $_stateType );
 
-        $msgScanModeType = config::byKey( 'msgScanModeType', 'grocy' );
+        $msgScanModeType = config::byKey( 'msg_scan_mode_type', 'grocy' );
 
         $scanState = array(
             'mode'  => $_stateMode,
@@ -639,12 +682,6 @@ class grocy extends eqLogic {
             log::add('grocy','warning', 'Aucune commande de notfication trouvée' );
             return false;
         }
-    }
-
-    private function demonScan() {
-
-        sleep(60);
-        self::stopScanMode();
     }
 
     // private function getImage( $name ) {

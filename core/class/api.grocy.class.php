@@ -97,8 +97,6 @@ class grocyAPI {
             }
             $request_http->setHeader( $headerArray );
 
-            log::add('grocy','debug','checkGrocyInstance: ' . print_r( $request_http, true ) );
-
             return $request_http->exec(30); 
         } catch (\Throwable $th) {
             return $th;
