@@ -187,7 +187,9 @@ class grocy extends eqLogic {
                 self::createCmd( $eqLogic->getId(), 'stock', 'stock', 'Stock actuel', 'numeric', '1', 'line' );
 
                 log::add('grocy_'.$today,'info','Création du produit ' . $product['product_name'] . ' dans Jeedom' );
-                return true;
+
+                return self::newStock( $eqLogic, 1, 1 );
+
             } else {
                 log::add('grocy_'.$today,'info','Produit inconnu dans OpenFoodFacts! Merci de le créer à la main dans Grocy et synchroniser Jeedom' );
                 return false;
