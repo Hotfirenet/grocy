@@ -274,6 +274,33 @@ class grocy extends eqLogic {
         return true;
     }
 
+    public static function supAllInQueue() {
+        config::save('tmp_queue', '' , 'grocy');
+        return true;
+    }
+
+    public static function supProductInQueue( $_eqLogicId ) {
+        $tmpQueue = config::byKey( 'tmp_queue', 'grocy');
+        if( is_array( $tmpQueue ) ) {
+
+            if (($key = array_search( $_eqLogicId , $tmpQueue )) !== false) {
+
+                unset($tmpQueue[$key]);
+
+                config::save('tmp_queue', $tmpQueue , 'grocy');
+    
+                log::add('grocy','debug','Suppression du produit: ' . $_eqLogicId);
+                return true;
+            }
+            
+            log::add('grocy','debug','Aucun produit dans la file d\'attente.');
+            return false;
+        }
+
+        log::add('grocy','debug','Aucun produit dans la file d\'attente.');
+        return false;
+    }
+
 
     /*     * *********************Méthodes d'instance************************* */
 
@@ -529,6 +556,7 @@ class grocy extends eqLogic {
         $scanStockValue  = 0;
         $termeStockValue = 0;   
         $eqLogicId       = $_eqLogic->getId();
+        $today           = date("Y-m-d");
 
         log::add('grocy', 'debug', 'op: ' . $_op . ' value: ' . $_value );
 
@@ -586,9 +614,12 @@ class grocy extends eqLogic {
 
             if( $isTmpProduct ) {
 
-                $tmpQueue = config::byKey('grocy_tmp_queue','grocy');
+                $checkTmpQueue = config::byKey('tmp_queue','grocy');
+                $tmpQueue      = is_array( $checkTmpQueue ) ? $checkTmpQueue : array() ;
+
                 if ( ! in_array( $eqLogicId, $tmpQueue ) ) {
                     $tmpQueue[] = $eqLogicId;
+                    log::add('grocy_'.$today, 'info', 'Ajout du produit ' . $_eqLogic->getName() . ' en file d\'attente.' );
                 }
                 config::save('tmp_queue' , $tmpQueue, 'grocy');
 
@@ -610,7 +641,6 @@ class grocy extends eqLogic {
                 log::add('grocy', 'debug', 'Result request: ' . print_r( $result, true ));
             }
 
-            $today = date("Y-m-d");
             $op = $_op == 1 ? ' add +' : ' rm -';
             log::add('grocy_'.$today, 'info', print_r( $_eqLogic->getName(), true ) .' old stock: ' . $stockValue . ' ' . $op . ' ' . $value . ' New stock: ' . $stock  );
             return true;

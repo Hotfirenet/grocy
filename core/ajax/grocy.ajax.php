@@ -85,6 +85,23 @@ try {
         }
     }
 
+    if( init('action') == 'supAllInQueue') {
+        if( grocy::supAllInQueue() ) {
+            ajax::success();
+        } else {
+            ajax::error( __('Erreur lors de la suppression de la file d\'attente, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'supProductInQueue') {
+        $eqLogicId = init( 'eqlogicid' );
+        if( grocy::supProductInQueue( $eqLogicId ) ) {
+            ajax::success();
+        } else {
+            ajax::error( __('Erreur lors de la suppression du produit dans la file d\'attente, voir les logs.', __FILE__) );
+        }
+    }
+
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */
 } catch (Exception $e) {

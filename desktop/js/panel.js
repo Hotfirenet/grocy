@@ -67,3 +67,53 @@ $('#bt_supAllProducts').on('click', function () {
 		}
 	});
 });
+
+$('#bt_supAllInQueue').on('click', function () {
+	$.ajax({
+		type: "POST",
+		url: "plugins/grocy/core/ajax/grocy.ajax.php",
+		data: {
+			action: "supAllInQueue"
+		},
+		dataType: 'json',
+		error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function (data) {
+			if (data.state != 'ok') {
+				$('#div_alert').showAlert({message: data.result, level: 'danger'});
+				return;
+			} else {
+				$('#div_alert').showAlert({message: 'Réinitialisation de la file d\'attente ok', level: 'success'});
+				$("#queueRow").remove();
+				//$("#queueTable").find("tr").remove();
+				return;
+			}
+		}
+	});
+});
+
+$('.product[data-action=supProductInQueue]').on('click', function () {
+	var bt = $(this);
+	$.ajax({
+		type: "POST",
+		url: "plugins/grocy/core/ajax/grocy.ajax.php",
+		data: {
+			action   : "supProductInQueue",
+			eqlogicid: bt.data('eqlogicid')
+		},
+		dataType: 'json',
+		error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function (data) {
+			if (data.state != 'ok') {
+				$('#div_alert').showAlert({message: data.result, level: 'danger'});
+				return;
+			} else {
+				bt.closest('tr').remove();
+				return;
+			}
+		}
+	});
+});
