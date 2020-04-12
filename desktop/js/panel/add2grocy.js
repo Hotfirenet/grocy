@@ -38,7 +38,6 @@ $(document).ready(function() {
             if(data.state=='ok') {
                 var productGroups = data.result.productGroups;
                 var s_productGroups = $('#productGroups');
-                s_productGroups.empty();
                 for (var i = 0; i < productGroups.length; i++) {
                     s_productGroups.append('<option value=' + productGroups[i].id + '>' + productGroups[i].name + '</option>');
                 }

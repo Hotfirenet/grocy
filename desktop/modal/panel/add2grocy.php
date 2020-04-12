@@ -68,7 +68,9 @@ $product   = $eqLogic->getConfiguration('openfoodfacts');
                         <div class="form-group">
                             <label class="col-lg-4 control-label">{{Groupe de produit}}</label>
                             <div class="col-lg-8">
-                                <select name="product_group_id" id="productGroups" class="form-control"></select>
+                                <select name="product_group_id" id="productGroups" class="form-control">
+                                    <option value="0">Aucun</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">

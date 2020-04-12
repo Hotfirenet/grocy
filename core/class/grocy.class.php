@@ -417,6 +417,10 @@ class grocy extends eqLogic {
         unset( $data['quantity'] );
         unset( $data['eqlogicid'] );
 
+        if( $data['product_group_id'] == 0 ) {
+            unset( $data['product_group_id'] );
+        }
+
         $url                 = config::byKey('grocy_url','grocy');
         $apikey              = config::byKey('grocy_apikey','grocy');
 
