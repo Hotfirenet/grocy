@@ -67,7 +67,7 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 <br />
 <div class="row" id="queueRow">
 	<div class="col-xs-12">
-		<h2>File d'attente</h2>
+		<h2>Code barre non connu</h2>
 		<table class="table table-striped table-bordered table-responsive table-sortable" id="queueTable">
 			<thead>
 				<tr>
@@ -75,7 +75,6 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 					<th scope="col">Nom</th>
 					<th scope="col">Code barre</th>
 					<th scope="col">Quantité</th>
-					<th scope="col">Produit dans Grocy</th>
 					<th scope="col" class="text-center">Action</th>
 				</tr>
 			</thead>
@@ -91,19 +90,14 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 						}
 						$i++;
 					?>
-						<tr>
+						<tr id="<?php echo $eqLogicId; ?>">
 							<th scope="row"><?php echo $i; ?></th>
 							<td><?php echo $eqLogicQueue->getName(); ?></td>
 							<td><?php echo $eqLogicQueue->getConfiguration('barcode'); ?></td>
 							<td><input type="text" name="qte" value="<?php echo $stockValue; ?>" size="5"></td>
-							<td>
-								<select id="grocyProduct" name="grocyProduct">
-									<option name="">Aucun</option>
-								</select>
-							</td>
 							<td class="text-center">
-								<a class="btn btn-info btn-sm product"  data-action="" style="margin-right:2%">Ajouter à Grocy</a>
-								<a class="btn btn-warning btn-sm product" data-action="" style="margin-right:2%">Consommer</a>
+								<a class="btn btn-info btn-sm product"  data-action="addProductInQueue" data-eqlogicid="<?php echo $eqLogicId; ?>" data-qte="<?php echo $stockValue; ?>" style="margin-right:2%">Ajouter à Grocy</a>
+								<a class="btn btn-warning btn-sm product" data-action="assocProductInQueue" data-eqlogicid="<?php echo $eqLogicId; ?>" style="margin-right:2%">Associer</a>
 								<a class="btn btn-danger btn-sm product" data-action="supProductInQueue" data-eqlogicid="<?php echo $eqLogicId; ?>">Supprimer</a>
 							</td>
 						</tr>
@@ -115,7 +109,7 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 		</table>
 	</div>
 </div>
-<div id="debug" class="row" style="background-color: white">
+<div id="debug" class="row" style="background-color: white; display:none">
 	<pre><?php  ?></pre>
 </div>
 <?php

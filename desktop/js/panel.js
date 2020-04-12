@@ -102,6 +102,7 @@ $('.product[data-action=supProductInQueue]').on('click', function () {
 			action   : "supProductInQueue",
 			eqlogicid: bt.data('eqlogicid')
 		},
+		async:false,
 		dataType: 'json',
 		error: function (request, status, error) {
 			handleAjaxError(request, status, error);
@@ -116,4 +117,20 @@ $('.product[data-action=supProductInQueue]').on('click', function () {
 			}
 		}
 	});
+});
+
+$('.product[data-action=assocProductInQueue]').on('click', function () {
+
+	$('#md_modal').dialog({title: "{{Association}}"});
+
+	$('#md_modal').load('index.php?v=d&plugin=grocy&modal=panel/panel.assoc&eqlogicid='+$(this).data('eqlogicid')+'&type=modal').dialog('open');
+
+});
+
+$('.product[data-action=addProductInQueue]').on('click', function () {
+
+	$('#md_modal').dialog({title: "{{Ajouter un nouveau produit à Grocy}}"});
+
+	$('#md_modal').load('index.php?v=d&plugin=grocy&modal=panel/add2grocy&eqlogicid='+$(this).data('eqlogicid')+'&qte='+$(this).data('qte')+'&type=modal').dialog('open');
+
 });

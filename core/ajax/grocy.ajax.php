@@ -102,6 +102,31 @@ try {
         }
     }
 
+    if( init('action') == 'getGrocyLocations') {
+        if( $locations = grocy::getGrocyLocations() ) {
+            ajax::success( array( 'locations' => $locations ) );
+        } else {
+            ajax::error( __('Erreur lors de la récupération des emplacements, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'getGrocyQuantityUnits') {
+        if( $quantityUnits = grocy::getGrocyQuantityUnits() ) {
+            ajax::success( array( 'quantityUnits' => $quantityUnits ) );
+        } else {
+            ajax::error( __('Erreur lors de la récupération des unités de quantité, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'createProductInGrocy') {
+
+        if( $product = grocy::createProductInGrocy( init( 'formdata' ) ) ) {
+            ajax::success( $product );
+        } else {
+            ajax::error( __('Erreur lors de la création du produit dans Grocy, voir les logs.', __FILE__) );
+        }
+    }
+
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */
 } catch (Exception $e) {

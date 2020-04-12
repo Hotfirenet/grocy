@@ -275,8 +275,30 @@ class grocy extends eqLogic {
     }
 
     public static function supAllInQueue() {
-        config::save('tmp_queue', '' , 'grocy');
-        return true;
+
+        $tmpQueue = config::byKey( 'tmp_queue', 'grocy');
+        if( is_array( $tmpQueue ) ) {
+
+            foreach( $tmpQueue as $eqLogicId ) {
+
+                $eqLogicQueue = eqLogic::byId( $eqLogicId );
+
+                if( is_object( $eqLogicQueue ) ) {
+
+                    $eqLogicQueue->remove();
+
+                } else {
+
+                    log::add('grocy','debug','Le produit ayant l\'id ' . $_eqLogicId . ' n\'a pas été trouvé.');
+                }
+            }
+
+            config::save('tmp_queue', '' , 'grocy');
+            return true;
+        }
+
+        log::add('grocy','debug','Erreur inconnu dans supAllInQueue, voir les logs.');
+        return false;
     }
 
     public static function supProductInQueue( $_eqLogicId ) {
@@ -285,12 +307,20 @@ class grocy extends eqLogic {
 
             if (($key = array_search( $_eqLogicId , $tmpQueue )) !== false) {
 
-                unset($tmpQueue[$key]);
+                $eqLogic = eqLogic::byId( $_eqLogicId );
+                if( is_object( $eqLogic ) ) {
 
-                config::save('tmp_queue', $tmpQueue , 'grocy');
-    
-                log::add('grocy','debug','Suppression du produit: ' . $_eqLogicId);
-                return true;
+                    $eqLogic->remove();
+
+                    unset($tmpQueue[$key]);
+                    config::save('tmp_queue', $tmpQueue , 'grocy');
+        
+                    log::add('grocy','debug','Suppression du produit: ' . $_eqLogicId);
+                    return true;
+                }
+
+                log::add('grocy','debug','Le produit ayant l\'id ' . $_eqLogicId . ' n\'a pas été trouvé.');
+                return false;
             }
             
             log::add('grocy','debug','Aucun produit dans la file d\'attente.');
@@ -299,6 +329,110 @@ class grocy extends eqLogic {
 
         log::add('grocy','debug','Aucun produit dans la file d\'attente.');
         return false;
+    }
+
+    public static function getGrocyLocations() {
+
+        $url             = config::byKey('grocy_url','grocy');
+        $apikey          = config::byKey('grocy_apikey','grocy');
+
+        $http            = new grocyAPI($url, $apikey);
+        $resultLocations = $http->getLocations();
+
+        if( is_json( $resultLocations ) ) {
+
+            $locations = json_decode( $resultLocations, true );  
+
+            if( isset( $locations['error_message'] ) ) {
+
+                log::add('grocy','error','getGrocyLocations: ' . print_r( $resultLocations, true ) );
+                return false;
+
+            } else {
+
+                return $locations;
+            }
+            
+        }
+    }
+
+    public static function getGrocyQuantityUnits() {
+
+        $url                 = config::byKey('grocy_url','grocy');
+        $apikey              = config::byKey('grocy_apikey','grocy');
+
+        $http                = new grocyAPI($url, $apikey);
+        $resultQuantityUnits = $http->getQuantityUnits();
+
+        if( is_json( $resultQuantityUnits ) ) {
+
+            $quantityUnits = json_decode( $resultQuantityUnits, true );  
+
+            if( isset( $quantityUnits['error_message'] ) ) {
+
+                log::add('grocy','error','getGrocyQuantityUnits: ' . print_r( $resultQuantityUnits, true ) );
+                return false;
+
+            } else {
+
+                return $quantityUnits;
+            }
+            
+        }
+    }
+
+    public static function createProductInGrocy( $_data ) {
+
+        $data = array();
+        parse_str( $_data, $data );
+
+        unset( $data['quantity'] );
+
+        $url                 = config::byKey('grocy_url','grocy');
+        $apikey              = config::byKey('grocy_apikey','grocy');
+
+        $http                = new grocyAPI($url, $apikey);
+        $resultCreateProduct = $http->createProduct( $data );
+
+        if( is_json( $resultCreateProduct ) ) {
+
+            $product = json_decode( $resultCreateProduct, true );
+
+            if( isset( $product['error_message'] ) ) {
+
+                log::add('grocy','error', 'createProductInGrocy: ' . $product['error_message'] );
+                return false;
+            }
+
+            $url = config::byKey('grocy_url', 'grocy');
+
+            if ( substr( $url, -1, 1 ) == '/') {
+                $url = $url;
+            } else {
+                $url = $url . '/';
+            }
+
+            $url = $url . 'product/' . $product['created_object_id'];
+
+            return array( 'url' => $url );
+
+
+        }
+
+        
+        // {   
+        //     "name": "Blinis",
+        //     "description": "test",
+        //     "location_id": "4",
+        //     "qu_id_purchase": "3",
+        //     "qu_id_stock": "3",
+        //     "qu_factor_purchase_to_stock": "1.0",
+        //     "barcode": "3292070001026",
+        //     "min_stock_amount": "0",
+        //     "default_best_before_days": "2",
+        //     "default_best_before_days_after_open": "0",
+        //     "allow_partial_units_in_stock": "0"
+        // }
     }
 
 

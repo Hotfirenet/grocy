@@ -11,6 +11,7 @@ class grocyAPI {
     private $apikey                 = '';
 
     private $apiLocations           = 'api/objects/locations';
+    private $apiQuantityUnits       = 'api/objects/quantity_units';
     private $apiProductGroups       = 'api/objects/product_groups';
     private $apiProducts            = 'api/objects/products';
     private $apiChores              = 'api/objects/chores';
@@ -40,6 +41,11 @@ class grocyAPI {
 
     public function getLocations() {
         $url = $this->url . $this->apiLocations;
+        return $this->sendCommand( $url );       
+    }
+
+    public function getQuantityUnits() {
+        $url = $this->url . $this->apiQuantityUnits;
         return $this->sendCommand( $url );       
     }
 
@@ -76,6 +82,12 @@ class grocyAPI {
         unset( $_data['product_id'] );
 
         return $this->sendCommand( $url, 'POST', $_data );         
+    }
+
+    public function createProduct( $_data ) {
+
+        $url = $this->url . $this->apiProducts;
+        return $this->sendCommand( $url, 'POST', $_data );  
     }
 
     private function sendCommand($_url, $_method = 'GET', $_data = array() ) {
