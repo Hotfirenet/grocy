@@ -383,6 +383,29 @@ class grocy extends eqLogic {
         }
     }
 
+    public function getGrocyProductGroups() {
+        $url                 = config::byKey('grocy_url','grocy');
+        $apikey              = config::byKey('grocy_apikey','grocy');
+
+        $http                = new grocyAPI($url, $apikey);
+        $resultProductGroups = $http->getProductGroups();
+
+        if( is_json( $resultProductGroups ) ) {
+
+            $productGroups = json_decode( $resultProductGroups, true );  
+
+            if( isset( $productGroups['error_message'] ) ) {
+
+                log::add('grocy','error','getGrocyProductGroups: ' . print_r( $resultProductGroups, true ) );
+                return false;
+
+            } else {
+
+                return $productGroups;
+            }
+        }
+    }
+
     public static function createProductInGrocy( $_data ) {
 
         $data = array();

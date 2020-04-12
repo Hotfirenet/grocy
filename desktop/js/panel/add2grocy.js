@@ -28,6 +28,30 @@ $(document).ready(function() {
 		type: "GET",
 		url: "plugins/grocy/core/ajax/grocy.ajax.php",
 		data: {
+			action   : "getGrocyProductGroups"
+		},
+		dataType: 'json',
+		error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function (data) {
+            if(data.state=='ok') {
+                var productGroups = data.result.productGroups;
+                var s_productGroups = $('#productGroups');
+                s_productGroups.empty();
+                for (var i = 0; i < productGroups.length; i++) {
+                    s_productGroups.append('<option value=' + productGroups[i].id + '>' + productGroups[i].name + '</option>');
+                }
+            } else {
+                error = true;
+                $('#div_alert').showAlert({message: data.result, level: 'danger'});
+            }
+		}
+    });
+	$.ajax({
+		type: "GET",
+		url: "plugins/grocy/core/ajax/grocy.ajax.php",
+		data: {
 			action   : "getGrocyQuantityUnits"
 		},
 		dataType: 'json',
@@ -50,7 +74,7 @@ $(document).ready(function() {
                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
             }
 		}
-	});
+    });
 });
 
 $('#bt_createProductInGrocy').on('click', function () {    

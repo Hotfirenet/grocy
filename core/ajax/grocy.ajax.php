@@ -118,6 +118,14 @@ try {
         }
     }
 
+    if( init('action') == 'getGrocyProductGroups') {
+        if( $productGroups = grocy::getGrocyProductGroups() ) {
+            ajax::success( array( 'productGroups' => $productGroups ) );
+        } else {
+            ajax::error( __('Erreur lors de la récupération des unités de quantité, voir les logs.', __FILE__) );
+        }
+    }
+
     if( init('action') == 'createProductInGrocy') {
 
         if( $product = grocy::createProductInGrocy( init( 'formdata' ) ) ) {
