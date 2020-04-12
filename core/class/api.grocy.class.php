@@ -26,12 +26,18 @@ class grocyAPI {
 
     function __construct( $_url = null, $_apikey = null) {
         $this->apikey = $_apikey;
+        $this->url = $this->checkUrl( $_url );
+    }
+
+    public function checkUrl( $_url ) {
 
         if ( substr( $_url, -1, 1 ) == '/') {
-            $this->url = $_url;
+            $url = $_url;
         } else {
-            $this->url = $_url . '/';
+            $url = $_url . '/';
         }
+
+        return $url;
     }
 
     public function checkInstance() {

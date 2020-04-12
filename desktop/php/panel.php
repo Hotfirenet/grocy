@@ -71,7 +71,6 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 		<table class="table table-striped table-bordered table-responsive table-sortable" id="queueTable">
 			<thead>
 				<tr>
-					<th scope="col">#</th>
 					<th scope="col">Nom</th>
 					<th scope="col">Code barre</th>
 					<th scope="col">Quantité</th>
@@ -91,7 +90,6 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 						$i++;
 					?>
 						<tr id="<?php echo $eqLogicId; ?>">
-							<th scope="row"><?php echo $i; ?></th>
 							<td><?php echo $eqLogicQueue->getName(); ?></td>
 							<td><?php echo $eqLogicQueue->getConfiguration('barcode'); ?></td>
 							<td><input type="text" name="qte" value="<?php echo $stockValue; ?>" size="5"></td>

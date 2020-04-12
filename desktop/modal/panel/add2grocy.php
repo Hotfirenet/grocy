@@ -23,9 +23,9 @@ if (!isConnect('admin')) {
 //include_file('desktop', 'add', 'css', 'grocy');
 include_file('desktop', 'panel/add2grocy', 'js', 'grocy');
 
-$eqLogic = eqLogic::byId( init('eqlogicid') );
-$product = $eqLogic->getConfiguration('openfoodfacts');
-
+$eqlogicid = init('eqlogicid');
+$eqLogic   = eqLogic::byId( $eqlogicid );
+$product   = $eqLogic->getConfiguration('openfoodfacts');
 
 ?>
 <div class="row row-overflow">
@@ -36,6 +36,7 @@ $product = $eqLogic->getConfiguration('openfoodfacts');
             </div>
             <div class="panel-body">
                 <form id="createProductInGrocy" class="form-horizontal">
+                    <input type="hidden" name="eqlogicid" value="<?php echo $eqlogicid; ?>" />
                     <fieldset>
                         <div class="form-group">
                             <label class="col-lg-4 control-label">{{Nom du produit}}</label>

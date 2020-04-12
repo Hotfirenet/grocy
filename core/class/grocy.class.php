@@ -314,6 +314,8 @@ class grocy extends eqLogic {
 
                     unset($tmpQueue[$key]);
                     config::save('tmp_queue', $tmpQueue , 'grocy');
+
+                    event::add('grocy::rmProductInQueue', array( 'eqlogicid' => $_eqLogicId ) );
         
                     log::add('grocy','debug','Suppression du produit: ' . $_eqLogicId);
                     return true;
@@ -386,7 +388,11 @@ class grocy extends eqLogic {
         $data = array();
         parse_str( $_data, $data );
 
+        $quantity  = $data['quantity'];
+        $eqlogicid = $data['eqlogicid'];
+
         unset( $data['quantity'] );
+        unset( $data['eqlogicid'] );
 
         $url                 = config::byKey('grocy_url','grocy');
         $apikey              = config::byKey('grocy_apikey','grocy');
@@ -404,35 +410,25 @@ class grocy extends eqLogic {
                 return false;
             }
 
-            $url = config::byKey('grocy_url', 'grocy');
+            $resultPurchaseProduct = $http->purchaseProduct( array( 'product_id' => $product['created_object_id'], 'amount' => $quantity ) );
 
-            if ( substr( $url, -1, 1 ) == '/') {
-                $url = $url;
-            } else {
-                $url = $url . '/';
+            if( is_json( $resultPurchaseProduct ) ) {
+
+                $purchaseProduct = json_decode( $resultPurchaseProduct, true );
+
+                if( isset( $purchaseProduct['error_message'] ) ) {
+
+                    log::add('grocy','error', 'createProductInGrocy: ' . $purchaseProduct['error_message'] );
+                    return false;
+                }
+    
+                if( self::supProductInQueue( $eqlogicid ) ) {
+    
+                    $url = $http->checkUrl( config::byKey('grocy_url', 'grocy') )  . 'product/' . $product['created_object_id'];
+                    return array( 'url' => $url );
+                }
             }
-
-            $url = $url . 'product/' . $product['created_object_id'];
-
-            return array( 'url' => $url );
-
-
         }
-
-        
-        // {   
-        //     "name": "Blinis",
-        //     "description": "test",
-        //     "location_id": "4",
-        //     "qu_id_purchase": "3",
-        //     "qu_id_stock": "3",
-        //     "qu_factor_purchase_to_stock": "1.0",
-        //     "barcode": "3292070001026",
-        //     "min_stock_amount": "0",
-        //     "default_best_before_days": "2",
-        //     "default_best_before_days_after_open": "0",
-        //     "allow_partial_units_in_stock": "0"
-        // }
     }
 
 

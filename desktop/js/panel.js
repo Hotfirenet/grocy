@@ -94,13 +94,12 @@ $('#bt_supAllInQueue').on('click', function () {
 });
 
 $('.product[data-action=supProductInQueue]').on('click', function () {
-	var bt = $(this);
 	$.ajax({
 		type: "POST",
 		url: "plugins/grocy/core/ajax/grocy.ajax.php",
 		data: {
 			action   : "supProductInQueue",
-			eqlogicid: bt.data('eqlogicid')
+			eqlogicid: $(this).data('eqlogicid')
 		},
 		async:false,
 		dataType: 'json',
@@ -111,10 +110,7 @@ $('.product[data-action=supProductInQueue]').on('click', function () {
 			if (data.state != 'ok') {
 				$('#div_alert').showAlert({message: data.result, level: 'danger'});
 				return;
-			} else {
-				bt.closest('tr').remove();
-				return;
-			}
+			} 
 		}
 	});
 });

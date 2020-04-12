@@ -71,9 +71,10 @@ $('#bt_createProductInGrocy').on('click', function () {
                 win.focus();
             } else {
                 alert('Please allow popups for this website');
-                $('#md_modal').dialog('close');
             }    
-		}
+
+            $('#md_modal').dialog('close');
+        }
     });
 })
 
