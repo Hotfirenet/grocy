@@ -71,10 +71,13 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 		<table class="table table-striped table-bordered table-responsive table-sortable" id="queueTable">
 			<thead>
 				<tr>
-					<th scope="col">Nom</th>
-					<th scope="col">Code barre</th>
-					<th scope="col">Quantité</th>
-					<th scope="col" class="text-center">Action</th>
+					<th scope="col"></th>
+					<th scope="col">{{Dénomination}}</th>
+					<th scope="col">{{Code barre}}</th>
+					<th scope="col">{{Quantité}}</th>
+					<th scope="col">{{Emplacement}}</th>
+					<th scope="col">{{Unité}}</th>
+					<th scope="col" class="text-center">{{Actions}}</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -90,9 +93,19 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 						$i++;
 					?>
 						<tr id="<?php echo $eqLogicId; ?>">
+							<td></td>
 							<td><?php echo $eqLogicQueue->getName(); ?></td>
-							<td><?php echo $eqLogicQueue->getConfiguration('barcode'); ?></td>
+							<td>
+								<?php echo $eqLogicQueue->getConfiguration('barcode'); ?>
+								<input type="hidden" name="" value="<?php echo $eqLogicQueue->getConfiguration('barcode'); ?>">
+							</td>
 							<td><input type="text" name="qte" value="<?php echo $stockValue; ?>" size="5"></td>
+							<td>
+								<select name="" id=""></select>
+							</td>
+							<td>
+								<select name="" id=""></select>
+							</td>
 							<td class="text-center">
 								<a class="btn btn-info btn-sm product"  data-action="addProductInQueue" data-eqlogicid="<?php echo $eqLogicId; ?>" data-qte="<?php echo $stockValue; ?>" style="margin-right:2%">Ajouter à Grocy</a>
 								<a class="btn btn-warning btn-sm product" data-action="assocProductInQueue" data-eqlogicid="<?php echo $eqLogicId; ?>" style="margin-right:2%">Associer</a>

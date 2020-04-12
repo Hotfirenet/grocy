@@ -89,13 +89,21 @@ $('#bt_createProductInGrocy').on('click', function () {
 			handleAjaxError(request, status, error);
 		},
 		success: function (data) {
-            var win = window.open(data.result.url, '_blank');
-            if (win) {
-                win.focus();
+            if(data.state=='ok'){
+                bootbox.confirm('{{Voulez vous confirmer la création du produit en ouvrant Grocy}}',
+                function (result) {
+                    if (result) {
+                        var win = window.open(data.result.url, '_blank');
+                        if (win) {
+                            win.focus();
+                        } else {
+                            alert('{{Vous devez accepter les popups pour ce site}}');
+                        }   
+                    }
+                }); 
             } else {
-                alert('Please allow popups for this website');
-            }    
-
+                $('#div_alert').showAlert({message: data.result, level: 'danger'});
+            }
             $('#md_modal').dialog('close');
         }
     });

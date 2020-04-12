@@ -115,9 +115,3 @@ $product   = $eqLogic->getConfiguration('openfoodfacts');
         </div>
     </div>
 </div>
-
-<div class="row" style="display:none">
-
- <pre><?php print_r( $eqLogic->getConfiguration('openfoodfacts')); ?></pre>
-
-</div>

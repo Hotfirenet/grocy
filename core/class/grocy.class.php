@@ -231,7 +231,8 @@ class grocy extends eqLogic {
             foreach ( $productsStock as $productStock ) {
                 
                 $searchEqLogic = eqLogic::byTypeAndSearhConfiguration('grocy','"product_id":"'.$productStock['product_id'].'"');
-                $eqLogic = $searchEqLogic[0];       
+                $eqLogic = $searchEqLogic[0];      
+                log::add('grocy','error','syncAllProductsStock: ' . print_r( $searchEqLogic, true ) ); 
 
                 if ( is_object( $eqLogic ) ) {
 
