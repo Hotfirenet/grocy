@@ -231,26 +231,30 @@ class grocy extends eqLogic {
             foreach ( $productsStock as $productStock ) {
                 
                 $searchEqLogic = eqLogic::byTypeAndSearhConfiguration('grocy','"product_id":"'.$productStock['product_id'].'"');
-                $eqLogic = $searchEqLogic[0];      
-                log::add('grocy','error','syncAllProductsStock: ' . print_r( $searchEqLogic, true ) ); 
+                
+                if( count( $searchEqLogic ) > 0 ) {
 
-                if ( is_object( $eqLogic ) ) {
-
-                    $currentStockCmd = grocyCmd::byEqLogicIdAndLogicalId( $eqLogic->getId(), 'stock' );
-
-                    if( is_object($currentStockCmd) ) {
-
-                        $currentStockCmd->event( $productStock['amount'] );
-
+                    $eqLogic = $searchEqLogic[0];      
+    
+                    if ( is_object( $eqLogic ) ) {
+    
+                        $currentStockCmd = grocyCmd::byEqLogicIdAndLogicalId( $eqLogic->getId(), 'stock' );
+    
+                        if( is_object($currentStockCmd) ) {
+    
+                            $currentStockCmd->event( $productStock['amount'] );
+    
+                        } else {
+                            $setError = true;
+                            log::add('grocy','error','Commande stock introuvable pour le produit: ' . $eqLogic->getName()  );
+                        }
+    
                     } else {
                         $setError = true;
-                        log::add('grocy','error','Commande stock introuvable pour le produit: ' . $eqLogic->getName()  );
-                    }
-
-                } else {
-                    $setError = true;
-                    log::add('grocy','warning','impossible de trouver le produit ayant pour identifiant Grocy: ' . $productStock['product_id'] );
-                }  
+                        log::add('grocy','debug','syncAllProductsStock: ' . print_r( $searchEqLogic, true ) ); 
+                        log::add('grocy','warning','impossible de trouver le produit ayant pour identifiant Grocy: ' . $productStock['product_id'] );
+                    }  
+                }
             }
 
             if( $setError == true ) 
