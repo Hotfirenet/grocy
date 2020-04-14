@@ -59,5 +59,5 @@ if ( in_array( $barCode, $scanModeType ) ) {
 if( grocy::scanProduct( $barCode ) ) {
     returnMsg( 'state', 'succes' );
 } else {
-    returnMsg( 'error', __('Erreur a definir !', __FILE__) );
+    returnMsg( 'error', __('Voir les logs!', __FILE__) );
 }

@@ -3,7 +3,7 @@ if (!isConnect()) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
 
-require_once __DIR__  . '/../../core/php/grocy.inc.php';
+
 
 #Si install locale
 // if( config::byKey('grocy:install:local','grocy') ) {
@@ -120,9 +120,21 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 		</table>
 	</div>
 </div>
-<div id="debug" class="row" style="background-color: white; display:none">
-	<pre><?php  ?></pre>
-</div>
 <?php
 
-include_file('desktop', 'panel', 'js', 'grocy');?>
+include_file('desktop', 'panel', 'js', 'grocy');
+
+
+// DB::Prepare('DROP TABLE IF EXISTS `grocy_extend`', array(), DB::FETCH_TYPE_ROW);
+
+// $sql = file_get_contents(dirname(__FILE__) . '/../../plugin_info/grocy.sql');
+// DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
+
+
+
+$grocy = utils::o2a( grocy_extend::byBarcode('3564700283776') );
+
+echo count($grocy);
+
+
+echo '<pre>' . print_r( $grocy, true ) . '</pre>';
