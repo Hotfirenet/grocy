@@ -75,7 +75,7 @@ $('.eqLogicAction[data-action=discover]').on('click', function (e) {
                 $('#div_alert').showAlert({message: '{{Synchronisation réalisée avec succès}}', level: 'success'});
                 setTimeout(function(){
                   location.reload();
-                }, 3000);
+                }, 1000);
               }
             });
           }

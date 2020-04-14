@@ -18,10 +18,9 @@ if ( config::byKey('scan_mode', 'grocy') == 1 ) {
 } else {
 	echo '<div class="alert jqAlert alert-warning" id="div_grocyScanAlert" style="padding : 7px 35px 7px 15px; display:none;">Test</div>';
 }
-//$product = json_decode( grocy::searchBarcodeInOpenFoodFactsDB( '3564700283776' ), true );
 
 $msgScanModeType = config::byKey( 'msg_scan_mode_type', 'grocy' );
-$tmpQueue         = config::byKey( 'tmp_queue', 'grocy');
+$tmpQueue         = is_array( config::byKey( 'tmp_queue', 'grocy') ) ? config::byKey( 'tmp_queue', 'grocy') : array();
 $buttonStop       = '<a class="btn btn-danger btn-sm" id="bt_stopScanMode" style="position:relative;top:-2px;"><i class="fas fa-times"></i> {{Désactiver}}</a>';
 $buttonA          = '<a class="btn btn-success btn-sm bt_startScanMode" data-mode="A" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Activer le mode achat</a>';
 $buttonC          = '<a class="btn btn-success btn-sm bt_startScanMode" data-mode="C" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Activer le mode consommation</a>';
@@ -82,7 +81,8 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 			</thead>
 			<tbody>
 			<?php
-				$i = 0;
+			if( count( $tmpQueue ) >= 1 ) {
+
 				foreach( $tmpQueue as $eqLogicId ) {
 					$eqLogicQueue = eqLogic::byId( $eqLogicId );
 					if( is_object( $eqLogicQueue ) ) {
@@ -115,6 +115,7 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 					<?php
 					}
 				}
+			}
 			?>
 			</tbody>
 		</table>
@@ -123,18 +124,3 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 <?php
 
 include_file('desktop', 'panel', 'js', 'grocy');
-
-
-// DB::Prepare('DROP TABLE IF EXISTS `grocy_extend`', array(), DB::FETCH_TYPE_ROW);
-
-// $sql = file_get_contents(dirname(__FILE__) . '/../../plugin_info/grocy.sql');
-// DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
-
-
-
-$grocy = utils::o2a( grocy_extend::byBarcode('3564700283776') );
-
-echo count($grocy);
-
-
-echo '<pre>' . print_r( $grocy, true ) . '</pre>';

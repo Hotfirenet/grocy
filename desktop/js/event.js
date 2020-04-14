@@ -22,5 +22,5 @@ $('body').on('grocy::rmProductInQueue', function (_event,_options) {
     console.log(_options.eqlogicid);
     
     // $('table#queueTable tr#3').remove();
-    $('#'+_options.eqlogicid).closest('tr').fadeOut(1000, function() { $(this).remove(); });
+    $('#'+_options.eqlogicid).closest('tr').fadeOut(500, function() { $(this).remove(); });
 });

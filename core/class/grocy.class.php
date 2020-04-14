@@ -644,13 +644,15 @@ class grocy extends eqLogic {
                             $jProduct = grocy::byLogicalId( $logicalId, 'grocy' );
                             if (!is_object($jProduct)) {
                     
+                                $productBarcode = isset( $product['barcode'] ) ? $product['barcode'] : '';
+
                                 $eqLogic = new grocy();
                                 $eqLogic->setName( $product['name'] );
                                 $eqLogic->setEqType_name( 'grocy' );
                                 $eqLogic->setLogicalId( $logicalId );
                                 $eqLogic->setObject_id( self::mapJeeObjectByLocationId( $product['location_id'] ) );
                                 $eqLogic->setConfiguration('product_id', $product['id'] );
-                                $eqLogic->setConfiguration('barcode', $product['barcode'] );
+                                $eqLogic->setConfiguration('barcode', $productBarcode );
                                 $eqLogic->setConfiguration('id_stock', $product['qu_id_stock'] );
                                 // TODO $eqLogic->setConfiguration('image', $this->getImage());
                                 $eqLogic->setIsEnable(1);
@@ -664,16 +666,19 @@ class grocy extends eqLogic {
                                 self::createCmd( $eqLogic->getId(), 'stock-terme', 'stock', 'Stock a terme', 'numeric', 0, 'line' );
                                 self::createCmd( $eqLogic->getId(), 'stock-scan', 'stock', 'Quantité scanné', 'numeric', 0, 'line' );
 
-                                $barcodes = explode( ',', $product['barcode'] );
+                                if( ! empty( $productBarcode ) ) {
+                                    
+                                    $barcodes = explode( ',', $product['barcode'] );
 
-                                foreach ( $barcodes as $barcode ) {
-    
-                                    self::grocyExtend( $eqLogic, 'save', array(
-                                        'product_id' => $product['id'],
-                                        'barcode'    => $barcode,
-                                        'eqlogic_id' => $eqLogic->getId()
-                                        ) 
-                                    );
+                                    foreach ( $barcodes as $barcode ) {
+        
+                                        self::grocyExtend( $eqLogic, 'save', array(
+                                            'product_id' => $product['id'],
+                                            'barcode'    => $barcode,
+                                            'eqlogic_id' => $eqLogic->getId()
+                                            ) 
+                                        );
+                                    }
                                 }
 
                                 event::add('jeedom::alert', array(
