@@ -111,6 +111,7 @@ $('.product[data-action=supProductInQueue]').on('click', function () {
 				$('#div_alert').showAlert({message: data.result, level: 'danger'});
 				return;
 			} 
+			console.log(data);
 		}
 	});
 });

@@ -80,6 +80,26 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 				</tr>
 			</thead>
 			<tbody>
+			<tr id="template" style="display:none">
+				<td></td>
+				<td>${product_name}</td>
+				<td>
+					${barcode}	
+					<input type="hidden" id="i_barcode" name="barcode" value="${barcode}">
+				</td>
+				<td><input type="text" name="qte" value="${quantity}" size="5"></td>
+				<td>
+					<select name="" id=""></select>
+				</td>
+				<td>
+					<select name="" id=""></select>
+				</td>
+				<td class="text-center">
+					<a class="btn btn-info btn-sm product" data-action="addProductInQueue" data-eqlogicid="${eqlogicid}" data-qte="1" style="margin-right:2%">Ajouter à Grocy</a>
+					<a class="btn btn-warning btn-sm product" data-action="assocProductInQueue" data-eqlogicid="${eqlogicid}" style="margin-right:2%">Associer</a>
+					<a class="btn btn-danger btn-sm product" data-action="supProductInQueue" data-eqlogicid="${eqlogicid}">Supprimer</a>
+				</td>
+			</tr>
 			<?php
 			if( count( $tmpQueue ) >= 1 ) {
 
@@ -90,7 +110,6 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 						if( is_object($jStock) ) {
 							$stockValue = $jStock->execCmd();
 						}
-						$i++;
 					?>
 						<tr id="<?php echo $eqLogicId; ?>">
 							<td></td>

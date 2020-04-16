@@ -17,10 +17,39 @@ $('body').on('grocy::scanState', function (_event,_options) {
     return;
 });
 
-$('body').on('grocy::rmProductInQueue', function (_event,_options) {
+$('body').on('grocy::unknowbarcodequeue', function (_event,_options) {
 
-    console.log(_options.eqlogicid);
-    
-    // $('table#queueTable tr#3').remove();
-    $('#'+_options.eqlogicid).closest('tr').fadeOut(500, function() { $(this).remove(); });
+    if(_options.action == 'add') {
+        var notexist = true;
+        $('#queueTable').find('tbody tr').each(function () {
+            if( $(this).attr('id') == _options.data.eqlogicid ) {
+                var row = $(this).find('td').eq(3);
+                row.fadeOut('slow', function(){
+                    row.find('input').val(_options.data.quantity);
+                });
+                
+                row.fadeIn(500);
+                notexist = false
+            } 
+        });
+
+        if(notexist) {
+            $('#template').clone().attr('id',_options.data.eqlogicid).appendTo( $('#queueTable') ); 
+            
+            var content = $('#'+_options.data.eqlogicid).closest('tr').html();
+            content = content.replace('${product_name}',_options.data.openfoodfacts.product_name);
+            content = content.replace('${barcode}',_options.data.openfoodfacts.code);
+            content = content.replace('${quantity}',_options.data.quantity);
+            content = content.replace('${eqlogicid}',_options.data.eqlogicid);
+            content = content.replace('${eqlogicid}',_options.data.eqlogicid);
+            content = content.replace('${eqlogicid}',_options.data.eqlogicid);
+
+            $('#'+_options.data.eqlogicid).html(content).fadeIn(1000, function() { $(this).show(); });
+        }
+
+
+    } else if (_options.action == 'rm') {
+        $('#'+_options.data.eqlogicid).closest('tr').fadeOut(1000, function() { $(this).remove(); });
+        return;
+    }
 });

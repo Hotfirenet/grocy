@@ -65,25 +65,28 @@ class grocy extends eqLogic {
 
         log::add('grocy','debug','grocyExtend > product_id: '. print_r( $product_id, true ) );
 
-        $grocy = new grocy_extend();
-        utils::a2o($grocy, array(
-            'product_id' => $product_id,
-            'barcode'    => $barcode,
-            'eqlogic_id' => $eqlogic_id
-            )
-        );
+        try {
 
-        log::add('grocy','debug','grocyExtend > grocy: '. print_r( $grocy, true ) );
-        log::add('grocy','debug','grocyExtend > do: '. $do );
+            $grocy = new grocy_extend();
+            utils::a2o($grocy, array(
+                'product_id' => $product_id,
+                'barcode'    => $barcode,
+                'eqlogic_id' => $eqlogic_id
+                )
+            );
+    
+            log::add('grocy','debug','grocyExtend > grocy: '. print_r( $grocy, true ) );
+            log::add('grocy','debug','grocyExtend > do: '. $do );
+    
+            if( $do == 'save' ) {
+                return $grocy->save();
+            } else {
+                return $grocy->remove();
+            }
 
-        if( $do == 'save' ) {
-            return $grocy->save();
-        } else {
-            return $grocy->remove();
+        } catch (\Throwable $th) {
+            log::add('grocy','error','grocyExtend > Throwable: '. print_r( $th, true ) );
         }
-        
-        log::add('grocy','debug','grocyExtend > Erreur inconnu' );
-        return false;
     }
 
 	public static function checkGrocyInstance() {
@@ -159,6 +162,7 @@ class grocy extends eqLogic {
         $today = date("Y-m-d");
 
         $grocy = utils::o2a( grocy_extend::byBarcode( $_barcode ) );
+        log::add('grocy','debug','scanProduct > grocy: ' . print_r( $grocy, true )  );
 
         if( isset( $grocy['eqlogic_id'] ) ) {
 
@@ -194,27 +198,28 @@ class grocy extends eqLogic {
 
                 if( isset( $result['product']['product_name'] ) ) {
 
-                    $product = $result['product'];
+                    $product       = $result['product'];
 
-                    $logicalId = 'grocy-'.$product['code'];
+                    $openfoodfacts = array(
+                        'code'             => $_barcode,
+                        'product_name'     => $product['product_name'],
+                        'generic_name_fr'  => $product['generic_name_fr'],
+                        'ingredients_text' => $product['ingredients_text'],
+                        'nutriments'       => $product['nutriments'],
+                    );
+
+                    $logicalId = 'grocy-'.$_barcode;
                     $eqLogic = new grocy();
                     $eqLogic->setName( $product['product_name'] );
                     $eqLogic->setEqType_name( 'grocy' );
                     $eqLogic->setLogicalId( $logicalId );
                     $eqLogic->setConfiguration('id_product', '0' );
-                    $eqLogic->setConfiguration('barcode', $product['code'] );
+                    $eqLogic->setConfiguration('barcode', $_barcode );
                     $eqLogic->setConfiguration('id_stock', '0' );
                     $eqLogic->setConfiguration('tmp', '1' );
-                    $eqLogic->setConfiguration('openfoodfacts', array(
-                        'code'             => $product['code'],
-                        'product_name'     => $product['product_name'],
-                        'generic_name_fr'  => $product['generic_name_fr'],
-                        'ingredients_text' => $product['ingredients_text'],
-                        'nutriments'       => $product['nutriments'],
-                        )
-                    );
+                    $eqLogic->setConfiguration('openfoodfacts', $openfoodfacts );
                     $eqLogic->setIsEnable(1);
-                    $eqLogic->setIsVisible('0');
+                    $eqLogic->setIsVisible(0);
                     $eqLogic->save();
     
                     self::createCmd( $eqLogic->getId(), 'add1', 'action', 'Ajouter', 'other', '1', '<i class="fas fa-plus"></i>' );
@@ -222,7 +227,16 @@ class grocy extends eqLogic {
                     self::createCmd( $eqLogic->getId(), 'stock', 'stock', 'Stock actuel', 'numeric', '1', 'line' );
     
                     self::grocyExtend( $eqLogic, 'save' );
-    
+
+                    event::add('grocy::unknowbarcodequeue', array(
+                        'action' => 'add',
+                        'data' => array( 
+                            'eqlogicid'     => $eqLogic->getId(),
+                            'openfoodfacts' => $openfoodfacts,
+                            'quantity'      => 1
+                        ),
+                        'message' => __('Produit crèe avec succès : ', __FILE__) . $product['product_name'],
+                    ));                       
     
                     log::add('grocy_'.$today,'info','Création du produit ' . $product['product_name'] . ' dans Jeedom' );
     
@@ -364,9 +378,17 @@ class grocy extends eqLogic {
                     unset($tmpQueue[$key]);
                     config::save('tmp_queue', $tmpQueue , 'grocy');
 
-                    event::add('grocy::rmProductInQueue', array( 'eqlogicid' => $_eqLogicId ) );
+                    $msg = __('Suppression du produit: ', __FILE__) . $_eqLogicId;
+
+                    event::add('grocy::unknowbarcodequeue', array(
+                        'action' => 'rm',
+                        'data' => array( 
+                            'eqlogicid' => $_eqLogicId 
+                        ),
+                        'message' => $msg,
+                    ));  
         
-                    log::add('grocy','debug','Suppression du produit: ' . $_eqLogicId);
+                    log::add('grocy','debug', $msg );
                     return true;
                 }
 
@@ -667,7 +689,7 @@ class grocy extends eqLogic {
                                 self::createCmd( $eqLogic->getId(), 'stock-scan', 'stock', 'Quantité scanné', 'numeric', 0, 'line' );
 
                                 if( ! empty( $productBarcode ) ) {
-                                    
+
                                     $barcodes = explode( ',', $product['barcode'] );
 
                                     foreach ( $barcodes as $barcode ) {
@@ -842,6 +864,15 @@ class grocy extends eqLogic {
                     log::add('grocy_'.$today, 'info', 'Ajout du produit ' . $_eqLogic->getName() . ' en file d\'attente.' );
                 }
                 config::save('tmp_queue' , $tmpQueue, 'grocy');
+
+                event::add('grocy::unknowbarcodequeue', array(
+                    'action' => 'add',
+                    'data' => array( 
+                        'eqlogicid'     => $eqLogicId,
+                        'quantity'      => $stock
+                    ),
+                    'message' => __(' : ', __FILE__) . $product['product_name'],
+                ));   
 
             } else {
 
