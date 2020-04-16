@@ -242,17 +242,17 @@ class grocy extends eqLogic {
     
                     return self::newStock( $eqLogic, 1, 1 );
                 } else {
-                    log::add('grocy_'.$today,'info','Produit imcomplet dans OpenFoodFacts! Merci de le créer à la main dans Grocy et synchroniser Jeedom' );
+                    log::add('grocy_'.$today,'info','Le produit '.$_barcode.' est imcomplet dans OpenFoodFacts! Merci de le créer à la main dans Grocy et synchroniser Jeedom' );
                     return false;
                 }
 
             } else {
-                log::add('grocy_'.$today,'info','Produit inconnu dans OpenFoodFacts! Merci de le créer à la main dans Grocy et synchroniser Jeedom' );
+                log::add('grocy_'.$today,'info','Le produit '.$_barcode.' est inconnu dans OpenFoodFacts! Merci de le créer à la main dans Grocy et synchroniser Jeedom' );
                 return false;
             }  
         }
 
-        log::add('grocy_'.$today,'info','Methode scanProduct: Erreur inconnu scan');
+        log::add( 'grocy_'.$today,'info','Methode scanProduct: Erreur inconnu scan > barcode: ' . $_barcode );
         return false;
     }
 

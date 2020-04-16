@@ -22,13 +22,14 @@ $('body').on('grocy::unknowbarcodequeue', function (_event,_options) {
     if(_options.action == 'add') {
         var notexist = true;
         $('#queueTable').find('tbody tr').each(function () {
-            if( $(this).attr('id') == _options.data.eqlogicid ) {
-                var row = $(this).find('td').eq(3);
-                row.fadeOut('slow', function(){
-                    row.find('input').val(_options.data.quantity);
+            var row = $(this);
+            if( row.attr('id') == _options.data.eqlogicid ) {
+                var col = $(this).find('td').eq(3);
+                row.fadeOut('slow', function() {
+                    row.fadeIn('slow', function() {
+                        col.find('input').val(_options.data.quantity);
+                    });
                 });
-                
-                row.fadeIn(500);
                 notexist = false
             } 
         });
