@@ -27,13 +27,13 @@ if (!isConnect()) {
         <div class="form-group">
             <label class="col-lg-4 control-label">{{Grocy URL}}</label>
             <div class="col-lg-8">
-                <input class="configKey form-control" data-l1key="grocy_url" />
+                <input class="configKey form-control" data-l1key="url" />
             </div>
         </div>
         <div class="form-group">
             <label class="col-lg-4 control-label">{{Grocy API KEY}}</label>
             <div class="col-lg-8">
-                <input class="configKey form-control" data-l1key="grocy_apikey" />
+                <input class="configKey form-control" data-l1key="apikey" />
             </div>
         </div>
 		<div class="form-group ashmode jeedom">
@@ -50,7 +50,7 @@ if (!isConnect()) {
 			</label>
 			<div class="col-sm-3 col-xs-12">
 				<div class="input-group">
-					<input type="text" class="grocyNotifAttr form-control roundedLeft configKey form-control" data-l1key="grocy_notif_cmd" />
+					<input type="text" class="grocyNotifAttr form-control roundedLeft configKey form-control" data-l1key="notif_cmd" />
 					<span class="input-group-btn">
 						<a class="btn btn-default cursor bt_selectWarnMeCmd roundedRight" title="{{Rechercher une commande}}"><i class="fas fa-list-alt"></i></a>
 					</span>
@@ -61,6 +61,18 @@ if (!isConnect()) {
             <label class="col-lg-4 control-label">{{Temps actif du mode C ou O}}</label>
             <div class="col-lg-8">
                 <input class="configKey form-control" data-l1key="time_mode" />
+            </div>
+        </div>
+		<div class="form-group">
+            <label class="col-lg-4 control-label">{{Nombre de jour pour la DLC par défaut}}</label>
+            <div class="col-lg-8">
+                <input class="configKey form-control" data-l1key="default_best_before_days" />
+            </div>
+        </div>
+		<div class="form-group">
+            <label class="col-lg-4 control-label">{{Nombre de jour pour la DLC après ouverture par défaut}}</label>
+            <div class="col-lg-8">
+                <input class="configKey form-control" data-l1key="default_best_before_days_after_open" />
             </div>
         </div>
 		<div class="form-group" style="display:none">
@@ -81,7 +93,7 @@ if (!isConnect()) {
 <script type="text/javascript">
 $('.bt_selectWarnMeCmd').on('click', function () {
   jeedom.cmd.getSelectModal({cmd: {type: 'action', subType: 'message'}}, function (result) {
-    $('.grocyNotifAttr[data-l1key="grocy_notif_cmd"]').value(result.human);
+    $('.grocyNotifAttr[data-l1key="notif_cmd"]').value(result.human);
   });
 });
 

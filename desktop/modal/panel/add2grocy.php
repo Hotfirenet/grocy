@@ -26,6 +26,7 @@ include_file('desktop', 'panel/add2grocy', 'js', 'grocy');
 $eqlogicid = init('eqlogicid');
 $eqLogic   = eqLogic::byId( $eqlogicid );
 $product   = $eqLogic->getConfiguration('openfoodfacts');
+$cache     = utils::o2a( cache::byKey('grocy::cache') );
 
 ?>
 <div class="row row-overflow">
@@ -62,7 +63,13 @@ $product   = $eqLogic->getConfiguration('openfoodfacts');
                         <div class="form-group">
                             <label class="col-lg-4 control-label">{{Emplacement}}</label>
                             <div class="col-lg-8">
-                                <select name="location_id" id="location" class="form-control"></select>
+                                <select name="location_id" id="location" class="form-control">
+                                <?php
+									foreach( $cache['value']['locations'] as $location ) {
+										echo '<option value="' . $location['id'] . '">' . $location['name'] . '</option>';
+									}
+								?>                                
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -70,19 +77,36 @@ $product   = $eqLogic->getConfiguration('openfoodfacts');
                             <div class="col-lg-8">
                                 <select name="product_group_id" id="productGroups" class="form-control">
                                     <option value="0">Aucun</option>
+                                    <?php
+									foreach( $cache['value']['productGroups'] as $productGroups ) {
+										echo '<option value="' . $productGroups['id'] . '">' . $productGroups['name'] . '</option>';
+									}
+								    ?>
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-lg-4 control-label">{{Format à l'achat}}</label>
                             <div class="col-lg-8">
-                                <select name="qu_id_purchase" id="qteUnitsPurchase" class="form-control"></select>
+                                <select name="qu_id_purchase" id="qteUnitsPurchase" class="form-control">
+                                <?php
+									foreach( $cache['value']['units'] as $unit ) {
+										echo '<option value="' . $unit['id'] . '">' . $unit['name'] . '</option>';
+									}
+								?>                            
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-lg-4 control-label">{{Format au stockage}}</label>
                             <div class="col-lg-8">
-                                <select name="qu_id_stock" id="qteUnitsStock" class="form-control"></select>
+                                <select name="qu_id_stock" id="qteUnitsStock" class="form-control">
+                                <?php
+									foreach( $cache['value']['units'] as $unit ) {
+										echo '<option value="' . $unit['id'] . '">' . $unit['name'] . '</option>';
+									}
+								?>  
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -95,6 +119,18 @@ $product   = $eqLogic->getConfiguration('openfoodfacts');
                             <label class="col-lg-4 control-label">{{Quantité}}</label>
                             <div class="col-lg-8">
                                 <input type="text" name="quantity" class="form-control" value="<?php echo init( 'qte' ); ?>" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-4 control-label">{{Jours avant péremption par défaut (DLC)}} <sup><i class="fas fa-question-circle tooltipstered" tooltip="{{A l'achat, ce nombre de jours sera ajouté à la date de péremption suggérée (-1 implique que ce produit ne périme jamais)}}"></i></sup></label>
+                            <div class="col-lg-8">
+                                <input type="text" name="default_best_before_days" class="form-control" value="" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-4 control-label">{{Date de péremption en jours par défaut après ouverture (DLC)}} <sup><i class="fas fa-question-circle tooltipstered" tooltip="{{Quand un produit est marqué comme ouvert, la date de péremption sera remplacée par la date du jour + ce nombre de jours (une valeur de 0 désactive ce changement)}}"></i></sup></label>
+                            <div class="col-lg-8">
+                                <input type="text" name="default_best_before_days_after_open" class="form-control" value="" />
                             </div>
                         </div>
                         <div class="form-group">

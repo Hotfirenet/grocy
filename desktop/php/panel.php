@@ -3,14 +3,12 @@ if (!isConnect()) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
 
-
-
 #Si install locale
 // if( config::byKey('grocy:install:local','grocy') ) {
-//     #echo '<iframe title="Grocy" src="'.config::byKey('grocy_url','grocy').'"></iframe>';
+//     #echo '<iframe title="Grocy" src="'.config::byKey('url','grocy').'"></iframe>';
 // } else {
 //     #redirige sur l'interface
-//     header('location: ' . config::byKey('grocy_url','grocy') );
+//     header('location: ' . config::byKey('url','grocy') );
 // }
 
 if ( config::byKey('scan_mode', 'grocy') == 1 ) {
@@ -19,7 +17,8 @@ if ( config::byKey('scan_mode', 'grocy') == 1 ) {
 	echo '<div class="alert jqAlert alert-warning" id="div_grocyScanAlert" style="padding : 7px 35px 7px 15px; display:none;">Test</div>';
 }
 
-$msgScanModeType = config::byKey( 'msg_scan_mode_type', 'grocy' );
+$cache            = utils::o2a( cache::byKey('grocy::cache') );
+$msgScanModeType  = config::byKey( 'msg_scan_mode_type', 'grocy' );
 $tmpQueue         = is_array( config::byKey( 'tmp_queue', 'grocy') ) ? config::byKey( 'tmp_queue', 'grocy') : array();
 $buttonStop       = '<a class="btn btn-danger btn-sm" id="bt_stopScanMode" style="position:relative;top:-2px;"><i class="fas fa-times"></i> {{Désactiver}}</a>';
 $buttonA          = '<a class="btn btn-success btn-sm bt_startScanMode" data-mode="A" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Activer le mode achat</a>';
@@ -30,7 +29,7 @@ $buttonResetQueue = '<a class="btn btn-danger btn-sm" id="bt_supAllInQueue" styl
 ?> 
 <div class="row">
 	<div class="col-xs-12" style="padding:20px 5px">
-	<a class="btn btn-success btn-sm" id="bt_instanceGrocy" style="position:relative;top:-2px;" href="<?php echo config::byKey('grocy_url', 'grocy'); ?>" target="_blank"><i class="fas fa-wrench"></i> {{Accéder à Grocy}}</a> | 
+	<a class="btn btn-success btn-sm" id="bt_instanceGrocy" style="position:relative;top:-2px;" href="<?php echo config::byKey('url', 'grocy'); ?>" target="_blank"><i class="fas fa-wrench"></i> {{Accéder à Grocy}}</a> | 
  <?php
 
 if( config::byKey('scan_mode', 'grocy') == 1 ) { 
@@ -89,11 +88,23 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 				</td>
 				<td><input type="text" name="qte" value="${quantity}" size="5"></td>
 				<td>
-					<select name="" id=""></select>
-				</td>
-				<td>
-					<select name="" id=""></select>
-				</td>
+								<select name="location" id="location">
+								<?php
+									foreach( $cache['value']['locations'] as $location ) {
+										echo '<option value="' . $location['id'] . '">' . $location['name'] . '</option>';
+									}
+								?>
+								</select>
+							</td>
+							<td>
+								<select name="unit" id="unit">
+								<?php
+									foreach( $cache['value']['units'] as $location ) {
+										echo '<option value="' . $location['id'] . '">' . $location['name'] . '</option>';
+									}
+								?>								
+								</select>
+							</td>
 				<td class="text-center">
 					<a class="btn btn-info btn-sm product" data-action="addProductInQueue" data-eqlogicid="${eqlogicid}" data-qte="1" style="margin-right:2%">Ajouter à Grocy</a>
 					<a class="btn btn-warning btn-sm product" data-action="assocProductInQueue" data-eqlogicid="${eqlogicid}" style="margin-right:2%">Associer</a>
@@ -120,10 +131,22 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 							</td>
 							<td><input type="text" name="qte" value="<?php echo $stockValue; ?>" size="5"></td>
 							<td>
-								<select name="" id=""></select>
+								<select name="location" id="location">
+								<?php
+									foreach( $cache['value']['locations'] as $location ) {
+										echo '<option value="' . $location['id'] . '">' . $location['name'] . '</option>';
+									}
+								?>
+								</select>
 							</td>
 							<td>
-								<select name="" id=""></select>
+								<select name="unit" id="unit">
+								<?php
+									foreach( $cache['value']['units'] as $location ) {
+										echo '<option value="' . $location['id'] . '">' . $location['name'] . '</option>';
+									}
+								?>								
+								</select>
 							</td>
 							<td class="text-center">
 								<a class="btn btn-info btn-sm product"  data-action="addProductInQueue" data-eqlogicid="<?php echo $eqLogicId; ?>" data-qte="<?php echo $stockValue; ?>" style="margin-right:2%">Ajouter à Grocy</a>

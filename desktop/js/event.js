@@ -45,12 +45,12 @@ $('body').on('grocy::unknowbarcodequeue', function (_event,_options) {
             content = content.replace('${eqlogicid}',_options.data.eqlogicid);
             content = content.replace('${eqlogicid}',_options.data.eqlogicid);
 
-            $('#'+_options.data.eqlogicid).html(content).fadeIn(1000, function() { $(this).show(); });
+            $('#'+_options.data.eqlogicid).html(content).fadeIn(300, function() { $(this).show(); });
         }
 
 
     } else if (_options.action == 'rm') {
-        $('#'+_options.data.eqlogicid).closest('tr').fadeOut(1000, function() { $(this).remove(); });
+        $('#'+_options.data.eqlogicid).closest('tr').fadeOut(300, function() { $(this).remove(); });
         return;
     }
 });

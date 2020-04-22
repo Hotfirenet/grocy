@@ -49,6 +49,10 @@ class grocy extends eqLogic {
         self::syncAllProductsStock();
 
     }
+
+    public static function cronDaily() {
+        grocy::buildGrocyCache();
+    }
     
     public static function grocyExtend( $_eqLogic, $do = null, $_data = null ) {
 
@@ -91,8 +95,8 @@ class grocy extends eqLogic {
 
 	public static function checkGrocyInstance() {
 
-        $url    = config::byKey('grocy_url','grocy');
-        $apikey = config::byKey('grocy_apikey','grocy');
+        $url    = config::byKey('url','grocy');
+        $apikey = config::byKey('apikey','grocy');
 
         $http   = new grocyAPI($url, $apikey);
         $result = $http->checkInstance();
@@ -230,7 +234,7 @@ class grocy extends eqLogic {
 
                     event::add('grocy::unknowbarcodequeue', array(
                         'action' => 'add',
-                        'data' => array( 
+                        'data'   => array( 
                             'eqlogicid'     => $eqLogic->getId(),
                             'openfoodfacts' => $openfoodfacts,
                             'quantity'      => 1
@@ -270,8 +274,8 @@ class grocy extends eqLogic {
 
     public static function syncAllProductsStock() {
         
-        $url             = config::byKey('grocy_url','grocy');
-        $apikey          = config::byKey('grocy_apikey','grocy');
+        $url             = config::byKey('url','grocy');
+        $apikey          = config::byKey('apikey','grocy');
 
         $http            = new grocyAPI($url, $apikey);
         $resultProductsStock = $http->getAllProductsStock();
@@ -406,8 +410,8 @@ class grocy extends eqLogic {
 
     public static function getGrocyLocations() {
 
-        $url             = config::byKey('grocy_url','grocy');
-        $apikey          = config::byKey('grocy_apikey','grocy');
+        $url             = config::byKey('url','grocy');
+        $apikey          = config::byKey('apikey','grocy');
 
         $http            = new grocyAPI($url, $apikey);
         $resultLocations = $http->getLocations();
@@ -431,8 +435,8 @@ class grocy extends eqLogic {
 
     public static function getGrocyQuantityUnits() {
 
-        $url                 = config::byKey('grocy_url','grocy');
-        $apikey              = config::byKey('grocy_apikey','grocy');
+        $url                 = config::byKey('url','grocy');
+        $apikey              = config::byKey('apikey','grocy');
 
         $http                = new grocyAPI($url, $apikey);
         $resultQuantityUnits = $http->getQuantityUnits();
@@ -455,8 +459,8 @@ class grocy extends eqLogic {
     }
 
     public function getGrocyProductGroups() {
-        $url                 = config::byKey('grocy_url','grocy');
-        $apikey              = config::byKey('grocy_apikey','grocy');
+        $url                 = config::byKey('url','grocy');
+        $apikey              = config::byKey('apikey','grocy');
 
         $http                = new grocyAPI($url, $apikey);
         $resultProductGroups = $http->getProductGroups();
@@ -492,8 +496,8 @@ class grocy extends eqLogic {
             unset( $data['product_group_id'] );
         }
 
-        $url                 = config::byKey('grocy_url','grocy');
-        $apikey              = config::byKey('grocy_apikey','grocy');
+        $url                 = config::byKey('url','grocy');
+        $apikey              = config::byKey('apikey','grocy');
 
         $http                = new grocyAPI($url, $apikey);
         $resultCreateProduct = $http->createProduct( $data );
@@ -522,11 +526,22 @@ class grocy extends eqLogic {
     
                 if( self::supProductInQueue( $eqlogicid ) ) {
     
-                    $url = $http->checkUrl( config::byKey('grocy_url', 'grocy') )  . 'product/' . $product['created_object_id'];
+                    $url = $http->checkUrl( config::byKey('url', 'grocy') )  . 'product/' . $product['created_object_id'];
                     return array( 'url' => $url );
                 }
             }
         }
+    }
+
+    public static function buildGrocyCache() {
+
+        $cache = array();
+
+        $cache['locations']     = grocy::getGrocyLocations();
+        $cache['units']     = grocy::getGrocyQuantityUnits();
+        $cache['productGroups'] = grocy::getGrocyProductGroups();
+
+        cache::set('grocy::cache', $cache);
     }
 
 
@@ -565,8 +580,8 @@ class grocy extends eqLogic {
 
     private function createLocationsInJeedom(){
 
-        $url             = config::byKey('grocy_url','grocy');
-        $apikey          = config::byKey('grocy_apikey','grocy');
+        $url             = config::byKey('url','grocy');
+        $apikey          = config::byKey('apikey','grocy');
 
         $http            = new grocyAPI($url, $apikey);
         $resultLocations = $http->getLocations();
@@ -628,8 +643,8 @@ class grocy extends eqLogic {
 
     private function createProductsInJeedom(){
 
-        $url                 = config::byKey('grocy_url','grocy');
-        $apikey              = config::byKey('grocy_apikey','grocy');
+        $url                 = config::byKey('url','grocy');
+        $apikey              = config::byKey('apikey','grocy');
 
         $http                = new grocyAPI($url, $apikey);
         $resultProductGroups = $http->getProductGroups();
@@ -792,7 +807,7 @@ class grocy extends eqLogic {
         $this->newStock( $this, 0, $_value );
     }
 
-    private function newStock( $_eqLogic, $_op, $_value ) {
+    private function newStock( $_eqLogic, $_op, $_value, $_noevent = false ) {
 
         $stockValue      = 0;
         $scanStockValue  = 0;
@@ -865,14 +880,16 @@ class grocy extends eqLogic {
                 }
                 config::save('tmp_queue' , $tmpQueue, 'grocy');
 
-                event::add('grocy::unknowbarcodequeue', array(
-                    'action' => 'add',
-                    'data' => array( 
-                        'eqlogicid'     => $eqLogicId,
-                        'quantity'      => $stock
-                    ),
-                    'message' => __(' : ', __FILE__) . $product['product_name'],
-                ));   
+                if( $_noevent ) {
+                    event::add('grocy::unknowbarcodequeue', array(
+                        'action' => 'add',
+                        'data' => array( 
+                            'eqlogicid'     => $eqLogicId,
+                            'quantity'      => $stock
+                        ),
+                        'message' => __(' : ', __FILE__) . $product['product_name'],
+                    ));   
+                }
 
             } else {
 
@@ -884,8 +901,8 @@ class grocy extends eqLogic {
                 $jTermeStock->event($termeStock);
     
                 //TODO partie a revoir pour faire un truc jolie en terme de widget
-                $url    = config::byKey('grocy_url','grocy');
-                $apikey = config::byKey('grocy_apikey','grocy');
+                $url    = config::byKey('url','grocy');
+                $apikey = config::byKey('apikey','grocy');
     
                 $http   = new grocyAPI($url, $apikey);
                 $result = call_user_func_array(array( $http, $grocyMethodAction ), array( array( 'product_id' => $_eqLogic->getConfiguration( 'product_id' ), 'amount' => $value ) ));
@@ -959,7 +976,7 @@ class grocy extends eqLogic {
 
     private function sendNotification( $_msg ) {
 
-        $cmd = cmd::byString( config::byKey('grocy_notif_cmd', 'grocy') ); 
+        $cmd = cmd::byString( config::byKey('notif_cmd', 'grocy') ); 
         if ( is_object( $cmd ) ) {
             $cmd->execCmd( $options = array( 'title' => 'Jeedom' , 'message' => $_msg ), $cache = 0);
             log::add('grocy','debug','Notif message: ' . $_msg );
