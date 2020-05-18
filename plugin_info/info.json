@@ -10,7 +10,7 @@
 	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
 	"eventjs" : true,
-	"changelog" : "https://hotfirenet.github.io/jeedom_docs/plugins/grocy/changelog/",
+	"changelog" : "https://hotfirenet.github.io/jeedom_docs/plugins/grocy/fr_FR/changelog.html",
 	"documentation" : "https://hotfirenet.github.io/jeedom_docs/plugins/grocy/fr_FR/",
 	"link" : {
 		"forum":"https://community.jeedom.com/tag/plugin-grocy",
