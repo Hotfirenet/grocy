@@ -73,7 +73,9 @@ $('.eqLogicAction[data-action=discover]').on('click', function (e) {
                   return;
                 }
                 $('#div_alert').showAlert({message: '{{Synchronisation réalisée avec succès}}', level: 'success'});
-                location.reload();
+                setTimeout(function(){
+                  location.reload();
+                }, 1000);
               }
             });
           }
@@ -98,7 +100,37 @@ $('.eqLogicAction[data-action=supAllProducts]').on('click', function () {
 			} else {
 				$('#div_alert').showAlert({message: 'Suppression des produits ok', level: 'success'});
       }
-      location.reload();
+      setTimeout(function(){
+        location.reload();
+      }, 3000);
 		}
 	});
 });
+
+$('.eqLogicAction[data-action=syncAllProductsStock]').on('click', function () {
+  $('#div_alert').showAlert({message: '{{Début de la synchronisation ...}}', level: 'warning'});
+	$.ajax({
+		type: "POST",
+		url: "plugins/grocy/core/ajax/grocy.ajax.php",
+		data: {
+			action: "syncAllProductsStock"
+		},
+		dataType: 'json',
+		error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function (data) {
+			if (data.state != 'ok') {
+				$('#div_alert').showAlert({message: data.result, level: 'danger'});
+				return;
+			} else {
+				$('#div_alert').showAlert({message: 'Synchronisation du stock des produits: OK', level: 'success'});
+      }
+      setTimeout(function(){
+        location.reload();
+      }, 3000);
+		}
+	});
+});
+
+

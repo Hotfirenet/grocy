@@ -19,7 +19,9 @@
 try {
     require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
     include_file('core', 'authentification', 'php');
-    include_file('core', 'grocy.inc', 'php', 'grocy');
+    
+    $scanModeType    = config::byKey( 'scan_mode_type'   , 'grocy' );
+    $msgScanModeType = config::byKey( 'msg_scan_mode_type', 'grocy' );
 
     if (!isConnect('admin')) {
         throw new Exception(__('401 - Accès non autorisé', __FILE__));
@@ -44,7 +46,7 @@ try {
    
     if( init('action') == 'startScanMode') {
         $type = init('type');
-        if( grocy::startScanMode( 'scan', $type, MESSAGE_MODE['JGROCY-A'] ) ) { 
+        if( grocy::startScanMode( 'scan', $type ) ) {
             ajax::success();
         } else {
             ajax::error('Erreur de connexion');
@@ -63,7 +65,7 @@ try {
         if( grocy::syncGrocy() ) {
             ajax::success( __('Tâche effectuée.', __FILE__) );
         } else {
-            ajax::error( __('Erreur lors de la création des emplacements, voir les logs.', __FILE__) );
+            ajax::error( __('Erreur lors de la synchronisation, voir les logs.', __FILE__) );
         }
     }
 
@@ -72,6 +74,64 @@ try {
             ajax::success();
         } else {
             ajax::error( __('Erreur lors de la suppression des produits, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'syncAllProductsStock') {
+        if( grocy::syncAllProductsStock() ) {
+            ajax::success();
+        } else {
+            ajax::error( __('Erreur lors de la synchronisation du stock des produits, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'supAllInQueue') {
+        if( grocy::supAllInQueue() ) {
+            ajax::success();
+        } else {
+            ajax::error( __('Erreur lors de la suppression de la file d\'attente, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'supProductInQueue') {
+        $eqLogicId = init( 'eqlogicid' );
+        if( grocy::supProductInQueue( $eqLogicId ) ) {
+            ajax::success();
+        } else {
+            ajax::error( __('Erreur lors de la suppression du produit dans la file d\'attente, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'getGrocyLocations') {
+        if( $locations = grocy::getGrocyLocations() ) {
+            ajax::success( array( 'locations' => $locations ) );
+        } else {
+            ajax::error( __('Erreur lors de la récupération des emplacements, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'getGrocyQuantityUnits') {
+        if( $quantityUnits = grocy::getGrocyQuantityUnits() ) {
+            ajax::success( array( 'quantityUnits' => $quantityUnits ) );
+        } else {
+            ajax::error( __('Erreur lors de la récupération des unités de quantité, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'getGrocyProductGroups') {
+        if( $productGroups = grocy::getGrocyProductGroups() ) {
+            ajax::success( array( 'productGroups' => $productGroups ) );
+        } else {
+            ajax::error( __('Erreur lors de la récupération des unités de quantité, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'createProductInGrocy') {
+
+        if( $product = grocy::createProductInGrocy( init( 'formdata' ) ) ) {
+            ajax::success( $product );
+        } else {
+            ajax::error( __('Erreur lors de la création du produit dans Grocy, voir les logs.', __FILE__) );
         }
     }
 

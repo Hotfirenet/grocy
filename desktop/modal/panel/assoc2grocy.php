@@ -16,7 +16,27 @@
 * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 */
 
-require_once __DIR__  . '/../../../../core/php/core.inc.php';
+if (!isConnect('admin')) {
+    throw new Exception('{{401 - Accès non autorisé}}');
+}
 
-$scanModeType    = config::byKey( 'scan_mode_type'   , 'grocy' );
-$msgScanModeType = config::byKey( 'msg_scan_mode_type', 'grocy' );
+$eqLogic = eqLogic::byId( init('eqlogicid') );
+
+
+
+?>
+
+<div class="row row-overflow">
+    <div class="col-xs-12" id="div_resumePluginList">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fas fa-cogs"></i> {{Ajouter un produit à Grocy}}</h3>
+            </div>
+            <div class="panel-body">
+                <form id="assocProductInGrocy" class="form-horizontal">
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

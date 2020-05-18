@@ -20,15 +20,51 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function grocy_install() {
     
+    $scanModeType = array( 
+        'JGROCY-A',
+        'JGROCY-C',
+        'JGROCY-O'
+    );
+
+    $msgScanModeType = array(
+        'JGROCY-A' => __('Grocy: Passage en mode achat', __FILE__),
+        'JGROCY-C' => __('Grocy: Passage en mode consommation', __FILE__),
+        'JGROCY-O' => __('Grocy: Passage en mode ouverture', __FILE__),
+    );
+
+    config::save('scan_mode_type'    , $scanModeType   , 'grocy');
+    config::save('msg_scan_mode_type', $msgScanModeType, 'grocy');
+    config::save('time_mode', 120    , 'grocy');
+    config::save('type_mode_sync'    , array( 'real' => 1, 'diff' => 0 ), 'grocy');
+    config::save('tmp_queue'         , '' , 'grocy');
+
+	$sql = file_get_contents(dirname(__FILE__) . '/grocy.sql');
+	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
 }
 
 function grocy_update() {
-    
+    config::save('time_mode'      , 120, 'grocy');
+    config::save('type_mode_sync' , array( 'real' => 1, 'diff' => 0 ), 'grocy');
+    config::save('tmp_queue'      , '' , 'grocy');
 }
 
 
 function grocy_remove() {
-    
+
+    config::remove('scanModeType'      , 'grocy');
+    config::remove('msg_scan_mode_type', 'grocy');
+    config::remove('time_mode'         , 'grocy');
+    config::remove('type_mode_sync'    , 'grocy');
+    config::remove('tmp_queue'         , 'grocy');
+
+    $grocy = plugin::byId('grocy');
+    $eqLogics = eqLogic::byType($plugin->grocy());
+
+    foreach ($eqLogics as $eqLogic) {
+        $eqLogic->remove();
+    }
+
+    DB::Prepare('DROP TABLE IF EXISTS `grocy_extend`', array(), DB::FETCH_TYPE_ROW);
 }
 
 

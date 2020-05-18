@@ -6,10 +6,10 @@ $plugin = plugin::byId('grocy');
 sendVarToJS('eqType', $plugin->getId());
 $eqLogics = eqLogic::byType($plugin->getId());
 
-if (config::byKey('scan_mode', 'grocy', 0) == 1) {
-	echo '<div class="alert jqAlert alert-warning" id="div_grocyScanAlert" style="padding : 7px 35px 7px 15px;">{{Vous êtes en mode scan. Recliquez sur le bouton scan pour sortir de ce mode.}}</div>';
+if ( config::byKey('scan_mode', 'grocy') == 1 ) {
+	echo '<div class="alert jqAlert alert-warning" id="div_grocyScanAlert" style="padding : 7px 35px 7px 15px;">{{Vous êtes en mode scan de type}} ' . config::byKey('scan_type', 'grocy'). '{{. Recliquez sur le bouton Désactiver pour sortir de ce mode}}</div>';
 } else {
-	echo '<div id="div_grocyScanAlert"></div>';
+	echo '<div class="alert jqAlert alert-warning" id="div_grocyScanAlert" style="padding : 7px 35px 7px 15px; display:none;">Test</div>';
 }
 ?>
 
@@ -22,7 +22,7 @@ if (config::byKey('scan_mode', 'grocy', 0) == 1) {
   <legend><i class="fas fa-cog"></i>  {{Gestion}}</legend>
   <div class="eqLogicThumbnailContainer">
       <div class="cursor eqLogicAction logoPrimary" data-action="discover" data-action2="all">
-        <i class="fas fa-bullseye"></i>
+        <i class="fas fa-sync"></i>
         <br>
         <span>{{Sync Grocy}}</span>
     </div>
@@ -35,6 +35,11 @@ if (config::byKey('scan_mode', 'grocy', 0) == 1) {
         <i class="fas fa-trash-alt"></i>
         <br>
         <span>{{Suppression des produits}}</span>
+    </div>
+    <div class="cursor eqLogicAction logoSecondary" data-action="syncAllProductsStock">
+        <i class="fas fa-sync-alt"></i>
+        <br>
+        <span>{{Synchroniser le stock des produits}}</span>
     </div>
   </div>
   <legend><i class="fas fa-table"></i> Grocy</legend>
