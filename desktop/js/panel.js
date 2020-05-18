@@ -120,7 +120,7 @@ $('.product[data-action=assocProductInQueue]').on('click', function () {
 
 	$('#md_modal').dialog({title: "{{Association}}"});
 
-	$('#md_modal').load('index.php?v=d&plugin=grocy&modal=panel/panel.assoc&eqlogicid='+$(this).data('eqlogicid')+'&type=modal').dialog('open');
+	$('#md_modal').load('index.php?v=d&plugin=grocy&modal=panel/assoc2grocy&eqlogicid='+$(this).data('eqlogicid')+'&type=modal').dialog('open');
 
 });
 

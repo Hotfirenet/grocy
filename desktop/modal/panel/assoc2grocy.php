@@ -26,7 +26,17 @@ $eqLogic = eqLogic::byId( init('eqlogicid') );
 
 ?>
 
-<pre><?php print_r( $eqLogic ); ?></pre>
+<div class="row row-overflow">
+    <div class="col-xs-12" id="div_resumePluginList">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fas fa-cogs"></i> {{Ajouter un produit à Grocy}}</h3>
+            </div>
+            <div class="panel-body">
+                <form id="assocProductInGrocy" class="form-horizontal">
 
-
-TESTTTTTT
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
