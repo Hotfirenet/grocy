@@ -263,6 +263,7 @@ class grocy extends eqLogic {
     public static function syncGrocy() {
         if( self::createLocationsInJeedom() ) {
             if( self::createProductsInJeedom() ) {
+                self::buildGrocyCache();
                 return self::syncAllProductsStock();
             } else {
                 return false;
@@ -538,7 +539,7 @@ class grocy extends eqLogic {
         $cache = array();
 
         $cache['locations']     = grocy::getGrocyLocations();
-        $cache['units']     = grocy::getGrocyQuantityUnits();
+        $cache['units']         = grocy::getGrocyQuantityUnits();
         $cache['productGroups'] = grocy::getGrocyProductGroups();
 
         cache::set('grocy::cache', $cache);
