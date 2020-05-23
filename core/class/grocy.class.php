@@ -597,6 +597,10 @@ class grocy extends eqLogic {
                 return false;
             } else {
 
+                if( count( $locations ) > 0 ) {
+
+                } 
+
                 foreach ( $locations as $location ) {
     
                     $jLocation = jeeObject::byName( $location['name'] );

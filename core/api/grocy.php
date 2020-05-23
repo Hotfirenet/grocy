@@ -16,6 +16,9 @@ if (!jeedom::apiAccess(init('apikey'), 'grocy')) {
     returnMsg( 'error', __('Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action (Grocy)', __FILE__) );
 }
 
+log::add('grocy','debug','Parametres GET: ' . $_GET );
+log::add('grocy','debug','Parametres POST: ' . $_POST );
+
 $barCode         = init('text');
 $scanModeType    = config::byKey( 'scan_mode_type'   , 'grocy' );
 
