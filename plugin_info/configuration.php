@@ -58,6 +58,18 @@ if (!isConnect()) {
 			</div>
 		</div>
 		<div class="form-group">
+            <label class="col-lg-4 control-label">{{Objet par défaut}}</label>
+            <div class="col-lg-8">
+			<select id="sel_defaultObject" class="configKey form-control" data-l1key="default_object">
+			  <?php
+				foreach (jeeObject::all() as $object) {
+				  echo '<option value="' . $object->getId() . '">' . $object->getName() . '</option>';
+				}
+			  ?>
+			</select>
+            </div>
+        </div>
+		<div class="form-group">
             <label class="col-lg-4 control-label">{{Temps actif du mode C ou O}}</label>
             <div class="col-lg-8">
                 <input class="configKey form-control" data-l1key="time_mode" />

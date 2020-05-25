@@ -93,6 +93,29 @@ $('#bt_supAllInQueue').on('click', function () {
 	});
 });
 
+$('#bt_buildGrocyCache').on('click', function () {
+	$.ajax({
+		type: "POST",
+		url: "plugins/grocy/core/ajax/grocy.ajax.php",
+		data: {
+			action: "buildGrocyCache"
+		},
+		dataType: 'json',
+		error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function (data) {
+			if (data.state != 'ok') {
+				$('#div_alert').showAlert({message: data.result, level: 'danger'});
+				return;
+			} else {
+				$('#div_alert').showAlert({message: 'Mise à jour des unités, groupes ... OK', level: 'success'});
+				return;
+			}
+		}
+	});
+});
+
 $('.product[data-action=supProductInQueue]').on('click', function () {
 	$.ajax({
 		type: "POST",

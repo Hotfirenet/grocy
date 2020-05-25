@@ -51,7 +51,7 @@ class grocy extends eqLogic {
     }
 
     public static function cronDaily() {
-        grocy::buildGrocyCache();
+        self::buildGrocyCache();
     }
     
     public static function grocyExtend( $_eqLogic, $do = null, $_data = null ) {
@@ -452,7 +452,7 @@ class grocy extends eqLogic {
                 return false;
 
             } else {
-
+                log::add('grocy','debug','quantityUnits: ' . print_r( $quantityUnits, true ) );
                 return $quantityUnits;
             }
             
@@ -542,7 +542,15 @@ class grocy extends eqLogic {
         $cache['units']         = grocy::getGrocyQuantityUnits();
         $cache['productGroups'] = grocy::getGrocyProductGroups();
 
-        cache::set('grocy::cache', $cache);
+        try {
+
+            cache::set('grocy::cache', $cache);
+            return true;
+
+        } catch (\Throwable $th) {
+            
+            return false;
+        }
     }
 
 
@@ -641,7 +649,7 @@ class grocy extends eqLogic {
         $mapObjects = array();
         foreach ($jObjects as $jObject) {
             $mapObjects[$jObject->getConfiguration('location_id')] = $jObject->getId();
-        }        
+        }   
 
         return $mapObjects[$location_id];
     }
@@ -676,8 +684,10 @@ class grocy extends eqLogic {
                     $products = json_decode( $resultProducts, true );
 
                     if( isset( $products['error_message'] ) ) {
+
                         log::add('grocy','error','resultProductsJson: ' . print_r( $resultProducts, true ) );
                         return false;
+                        
                     } else {
                         foreach ( $products as $product ) {
 
@@ -686,19 +696,20 @@ class grocy extends eqLogic {
                             $jProduct = grocy::byLogicalId( $logicalId, 'grocy' );
                             if (!is_object($jProduct)) {
                     
-                                $productBarcode = isset( $product['barcode'] ) ? $product['barcode'] : '';
+                                $productBarcode           = isset( $product['barcode'] ) ? $product['barcode'] : '';
+                                $mapJeeObjectByLocationId = self::mapJeeObjectByLocationId( $product['location_id'] );
+                                $objectId                 = empty( $mapJeeObjectByLocationId ) ? config::byKey('default_object','grocy') : $mapJeeObjectByLocationId ;
 
                                 $eqLogic = new grocy();
                                 $eqLogic->setName( $product['name'] );
                                 $eqLogic->setEqType_name( 'grocy' );
                                 $eqLogic->setLogicalId( $logicalId );
-                                $eqLogic->setObject_id( self::mapJeeObjectByLocationId( $product['location_id'] ) );
+                                $eqLogic->setObject_id( $objectId );
                                 $eqLogic->setConfiguration('product_id', $product['id'] );
                                 $eqLogic->setConfiguration('barcode', $productBarcode );
                                 $eqLogic->setConfiguration('id_stock', $product['qu_id_stock'] );
-                                // TODO $eqLogic->setConfiguration('image', $this->getImage());
-                                $eqLogic->setIsEnable(1);
-                                $eqLogic->setIsVisible('0');
+                                $eqLogic->setIsEnable( 1 );
+                                $eqLogic->setIsVisible( 0 );
                                 $eqLogic->setDisplay('icon', '<i class="fas fa-minus"></i>');
                                 $eqLogic->save();
 

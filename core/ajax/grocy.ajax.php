@@ -122,7 +122,7 @@ try {
         if( $productGroups = grocy::getGrocyProductGroups() ) {
             ajax::success( array( 'productGroups' => $productGroups ) );
         } else {
-            ajax::error( __('Erreur lors de la récupération des unités de quantité, voir les logs.', __FILE__) );
+            ajax::error( __('Erreur lors de la récupération des groupes de produits, voir les logs.', __FILE__) );
         }
     }
 
@@ -132,6 +132,15 @@ try {
             ajax::success( $product );
         } else {
             ajax::error( __('Erreur lors de la création du produit dans Grocy, voir les logs.', __FILE__) );
+        }
+    }
+
+    if( init('action') == 'buildGrocyCache') {
+
+        if( $cache = grocy::buildGrocyCache() ) {
+            ajax::success();
+        } else {
+            ajax::error( __('Erreur lors de la mise en cache, voir les logs.', __FILE__) );
         }
     }
 

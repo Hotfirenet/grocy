@@ -54,6 +54,7 @@ if( config::byKey('scan_mode', 'grocy') == 1 ) {
 
 		| <a class="btn btn-success btn-sm" id="bt_inventaire" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Inventaire</a>
 		| <a class="btn btn-danger btn-sm" id="bt_supAllProducts" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Supprimer tous les produits</a>
+		| <a class="btn btn-success btn-sm" id="bt_buildGrocyCache" style="position:relative;top:-2px;"><i class="fas fa-wrench"></i> Sync Unités, Groupes ...</a>
 		<?php if( count( $tmpQueue ) >= 1 ) echo ' | ' . $buttonResetQueue; ?> 
 	</div>
 </div>
