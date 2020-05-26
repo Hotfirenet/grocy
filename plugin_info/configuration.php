@@ -25,10 +25,22 @@ if (!isConnect()) {
 <form class="form-horizontal">
     <fieldset>
         <div class="form-group">
-            <label class="col-lg-4 control-label">{{Grocy URL}}</label>
+            <label class="col-lg-4 control-label">{{Grocy URL}} 
+				<sup><i class="fas fa-question-circle tooltips" title="{{Le dossier est facultatif}}"></i></sup>
+			</label>
             <div class="col-lg-8">
-                <input class="configKey form-control" data-l1key="url" />
-            </div>
+				<div class="input-group">
+					<select class="configKey tooltips form-control" data-l1key="protocol">
+						<option value='https'>{{HTTPS}}</option>
+						<option value='http' selected>{{HTTP}}</option>
+					</select>
+					<span class="input-group-addon">://</span>
+					<input type="text" class="configKey tooltips form-control" data-l1key="ip_tld" placeholder="{{IP ou Nom de domaine}}"/>
+					<span class="input-group-addon">:</span>
+					<input type="text" class="configKey tooltips form-control" data-l1key="port" placeholder="{{Port (Optionnel)}}"/>
+					<span class="input-group-addon">/</span>
+					<input type="text" class="configKey tooltips form-control" data-l1key="folder" placeholder="{{Dossier (Optionnel)}}"/>
+            	</div>
         </div>
         <div class="form-group">
             <label class="col-lg-4 control-label">{{Grocy API KEY}}</label>
@@ -103,30 +115,51 @@ if (!isConnect()) {
 // }
 ?>
 <script type="text/javascript">
-$('.bt_selectWarnMeCmd').on('click', function () {
-  jeedom.cmd.getSelectModal({cmd: {type: 'action', subType: 'message'}}, function (result) {
-    $('.grocyNotifAttr[data-l1key="notif_cmd"]').value(result.human);
-  });
-});
 
-$('#bt_checkGrocyInstance').on('click', function () {
-	$.ajax({
-		type: "POST",
-		url: "plugins/grocy/core/ajax/grocy.ajax.php",
-		data: {
-			action: "checkGrocyInstance",
-		},
-		dataType: 'json',
-		error: function (request, status, error) {
-			handleAjaxError(request, status, error);
-		},
-		success: function (data) {
-			if (data.state != 'ok') {
-				$('#div_alertPluginConfiguration').showAlert({message: data.result, level: 'danger'});
-				return;
+	function grocy_postSaveConfiguration(){
+		$.ajax({
+			type: "POST",
+			url: "plugins/grocy/core/ajax/grocy.ajax.php",
+			data: {
+				action: "makeUrl",
+			},
+			dataType: 'json',
+			error: function (request, status, error) {
+				handleAjaxError(request, status, error);
+			},
+			success: function (data) {
+				if (data.state != 'ok') {
+					$('#div_alert').showAlert({message: data.result, level: 'danger'});
+					return;
+				}
 			}
-			$('#div_alertPluginConfiguration').showAlert({message: '{{Connexion ok.}}', level: 'success'});
-		}
+		});
+	};
+
+	$('.bt_selectWarnMeCmd').on('click', function () {
+	jeedom.cmd.getSelectModal({cmd: {type: 'action', subType: 'message'}}, function (result) {
+		$('.grocyNotifAttr[data-l1key="notif_cmd"]').value(result.human);
 	});
-});
+	});
+
+	$('#bt_checkGrocyInstance').on('click', function () {
+		$.ajax({
+			type: "POST",
+			url: "plugins/grocy/core/ajax/grocy.ajax.php",
+			data: {
+				action: "checkGrocyInstance",
+			},
+			dataType: 'json',
+			error: function (request, status, error) {
+				handleAjaxError(request, status, error);
+			},
+			success: function (data) {
+				if (data.state != 'ok') {
+					$('#div_alertPluginConfiguration').showAlert({message: data.result, level: 'danger'});
+					return;
+				}
+				$('#div_alertPluginConfiguration').showAlert({message: '{{Connexion ok.}}', level: 'success'});
+			}
+		});
+	});
 </script>

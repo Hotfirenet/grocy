@@ -95,14 +95,14 @@ $('.eqLogicAction[data-action=supAllProducts]').on('click', function () {
 		},
 		success: function (data) {
 			if (data.state != 'ok') {
-				$('#div_alert').showAlert({message: data.result, level: 'danger'});
+			//	$('#div_alert').showAlert({message: data.result, level: 'danger'});
 				return;
 			} else {
 				$('#div_alert').showAlert({message: 'Suppression des produits ok', level: 'success'});
       }
       setTimeout(function(){
         location.reload();
-      }, 3000);
+      }, 1000);
 		}
 	});
 });

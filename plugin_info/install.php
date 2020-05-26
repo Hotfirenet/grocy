@@ -32,11 +32,13 @@ function grocy_install() {
         'JGROCY-O' => __('Grocy: Passage en mode ouverture', __FILE__),
     );
 
-    config::save('scan_mode_type'    , $scanModeType   , 'grocy');
-    config::save('msg_scan_mode_type', $msgScanModeType, 'grocy');
-    config::save('time_mode', 120    , 'grocy');
-    config::save('type_mode_sync'    , array( 'real' => 1, 'diff' => 0 ), 'grocy');
-    config::save('tmp_queue'         , '' , 'grocy');
+    config::save('scan_mode_type'     , $scanModeType   , 'grocy');
+    config::save('msg_scan_mode_type' , $msgScanModeType, 'grocy');
+    config::save('time_mode', 120     , 'grocy');
+    config::save('type_mode_sync'     , array( 'real' => 1, 'diff' => 0 ), 'grocy');
+    config::save('tmp_queue'           , '' , 'grocy');
+    config::save('displayDesktopPanel' , 1 , 'grocy');
+    
 
 	$sql = file_get_contents(dirname(__FILE__) . '/grocy.sql');
 	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
@@ -47,7 +49,6 @@ function grocy_update() {
     config::save('type_mode_sync' , array( 'real' => 1, 'diff' => 0 ), 'grocy');
     config::save('tmp_queue'      , '' , 'grocy');
 }
-
 
 function grocy_remove() {
 
