@@ -299,7 +299,7 @@ class grocy extends eqLogic {
     
                     if ( is_object( $eqLogic ) ) {
     
-                        $currentStockCmd = grocyCmd::byEqLogicIdAndLogicalId( $eqLogic->getId(), 'stock' );
+                        $currentStockCmd = grocyCmd::byEqLogicIdAndLogicalId( $eqLogic->getId(), 'amount' );
     
                         if( is_object($currentStockCmd) ) {
     
