@@ -34,8 +34,8 @@ try {
         if( is_json( $result ) ) {
             ajax::success();
         } else {
-            if( is_object() ) {
-                ajax::error(displayException($result), $result->getCode());
+            if( is_object( $result ) ) {
+                ajax::error( displayException($result), $result->getCode() );
             } else {
                 ajax::error('Erreur de connexion');
             }

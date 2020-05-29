@@ -15,10 +15,11 @@ class grocyAPI {
     private $apiProductGroups       = 'api/objects/product_groups';
     private $apiProducts            = 'api/objects/products';
     private $apiChores              = 'api/objects/chores';
+    private $apiShoppingList        = 'api/objects/shopping_lists';
+    private $apiBatteries           = 'api/objects/batteries';
     private $apiStock               = 'api/stock';
     private $apiStockProductAdd     = 'api/stock/products/%d/add';
     private $apiStockProductConsume = 'api/stock/products/%d/consume';
-    private $apiShoppingList        = 'api/stock/shoppinglist/';
     private $apiChoresExex          = 'api/chores/';
     private $apiSystemInfo          = 'api/system/info';
     
@@ -43,6 +44,11 @@ class grocyAPI {
     public function checkInstance() {
         $url = $this->url . $this->apiSystemInfo;
         return $this->sendCommand( $url );
+    }
+
+    public function getShoppingLists() {
+        $url = $this->url . $this->apiShoppingList;
+        return $this->sendCommand( $url );       
     }
 
     public function getLocations() {
@@ -93,6 +99,12 @@ class grocyAPI {
     public function createProduct( $_data ) {
 
         $url = $this->url . $this->apiProducts;
+        return $this->sendCommand( $url, 'POST', $_data );  
+    }
+
+    public function createBattery( $_data ) {
+
+        $url = $this->url . $this->apiBatteries;
         return $this->sendCommand( $url, 'POST', $_data );  
     }
 
