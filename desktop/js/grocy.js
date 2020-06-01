@@ -102,7 +102,7 @@ $('.eqLogicAction[data-action=supAllProducts]').on('click', function () {
       }
       setTimeout(function(){
         location.reload();
-      }, 3000);
+      }, 1000);
 		}
 	});
 });
@@ -128,7 +128,7 @@ $('.eqLogicAction[data-action=syncAllProductsStock]').on('click', function () {
       }
       setTimeout(function(){
         location.reload();
-      }, 3000);
+      }, 1000);
 		}
 	});
 });

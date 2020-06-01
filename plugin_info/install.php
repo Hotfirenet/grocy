@@ -38,6 +38,8 @@ function grocy_install() {
     config::save('type_mode_sync'    , array( 'real' => 1, 'diff' => 0 ), 'grocy');
     config::save('tmp_queue'         , '' , 'grocy');
 
+    grocy::grocyEqLogic();
+
 	$sql = file_get_contents(dirname(__FILE__) . '/grocy.sql');
 	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
 }
@@ -46,6 +48,8 @@ function grocy_update() {
     config::save('time_mode'      , 120, 'grocy');
     config::save('type_mode_sync' , array( 'real' => 1, 'diff' => 0 ), 'grocy');
     config::save('tmp_queue'      , '' , 'grocy');
+
+    grocy::grocyEqLogic();
 }
 
 

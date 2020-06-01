@@ -135,6 +135,16 @@ try {
         }
     }
 
+    if( init('action') == 'makeUrl' ) {
+
+        if( $url = grocy::makeUrl() ) {
+            config::save('url', $url, 'grocy');
+            ajax::success();
+        } else {
+            ajax::error( __('Erreur lors de la création du produit dans Grocy, voir les logs.', __FILE__) );
+        }
+    }
+
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */
 } catch (Exception $e) {

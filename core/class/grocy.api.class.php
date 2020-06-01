@@ -102,10 +102,21 @@ class grocyAPI {
         return $this->sendCommand( $url, 'POST', $_data );  
     }
 
+    public function getBatteries() {
+        $url = $this->url . $this->apiBatteries;
+        return $this->sendCommand( $url );            
+    }
+
     public function createBattery( $_data ) {
 
         $url = $this->url . $this->apiBatteries;
         return $this->sendCommand( $url, 'POST', $_data );  
+    }
+
+    public function updateBattery( $_data ) {
+
+        $url = $this->url . $this->apiBatteries;
+        return $this->sendCommand( $url, 'PUT', $_data );  
     }
 
     private function sendCommand($_url, $_method = 'GET', $_data = array() ) {

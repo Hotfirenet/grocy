@@ -1,0 +1,93 @@
+{
+    "commands":[
+        {
+            "name":"Mode",
+            "type":"info",
+            "subtype":"numeric",
+            "isVisible":1,
+            "isHistorized":1,
+            "logicalId":"mode",
+            "template":{
+                "dashboard":"line",
+                "mobile":"line"
+            }
+        },
+        {
+            "name":"Mode Ajouter",
+            "type":"action",
+            "subtype":"other",
+            "display":{
+                "icon":"<i class=\"fas fa-barcode\"><\/i>"
+            },
+            "isVisible":1,
+            "logicalId":"JGROCY-A"
+        },
+        {
+            "name":"Mode Consommer",
+            "type":"action",
+            "subtype":"other",
+            "display":{
+                "icon":"<i class=\"fas fa-barcode\"><\/i>"
+            },
+            "isVisible":1,
+            "logicalId":"JGROCY-C"
+        },
+        {
+            "name":"Mode Ouvrir",
+            "type":"action",
+            "subtype":"other",
+            "display":{
+                "icon":"<i class=\"fas fa-barcode\"><\/i>"
+            },
+            "isVisible":1,
+            "logicalId":"JGROCY-O"
+        },
+        {
+            "name":"Tout synchroniser",
+            "type":"action",
+            "subtype":"other",
+            "display":{
+                "icon":"<i class=\"fas fa-sync-alt\"><\/i>"
+            },
+            "isVisible":1,
+            "logicalId":"sync"
+        },
+        {
+            "name":"Synchroniser les produits",
+            "type":"action",
+            "subtype":"other",
+            "display":{
+                "icon":"<i class=\"fas fa-sync-alt\"><\/i>"
+            },
+            "isVisible":1,
+            "logicalId":"sync-products"
+        },
+        {
+            "name":"Synchroniser les batteries",
+            "type":"action",
+            "subtype":"other",
+            "display":{
+                "icon":"<i class=\"fas fa-sync-alt\"><\/i>"
+            },
+            "isVisible":1,
+            "logicalId":"sync-batteries"
+        },
+        {
+            "name":"Synchroniser les listes de courses",
+            "type":"action",
+            "subtype":"other",
+            "display":{
+                "icon":"<i class=\"fas fa-sync-alt\"><\/i>"
+            },
+            "isVisible":1,
+            "logicalId":"sync-shoppingList"
+        },
+        {
+            "name": "Rafraichir",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 0,
+            "logicalId": "refresh"
+          }
+        ]
+}

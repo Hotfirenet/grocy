@@ -1,0 +1,58 @@
+{
+    "commands":[
+       {
+          "name":"Quantité en stock / Format",
+          "type":"info",
+          "subtype":"numeric",
+          "isVisible":1,
+          "isHistorized":1,
+          "logicalId":"amount",
+          "template":{
+             "dashboard":"line",
+             "mobile":"line"
+          }
+       },
+       {
+        "name":"Ajouter +1",
+        "type":"action",
+        "subtype":"other",
+        "display":{
+           "icon":"<i class=\"fas fa-plus\"><\/i>"
+        },
+        "isVisible":1,
+        "logicalId":"add1"
+     },
+     {
+        "name":"Enlever -1",
+        "type":"action",
+        "subtype":"other",
+        "display":{
+           "icon":"<i class=\"fas fa-minus\"><\/i>"
+        },
+        "isVisible":1,
+        "logicalId":"minus1"
+     },
+     {
+        "name":"Ajouter une quantité",
+        "type":"action",
+        "subtype":"message",
+        "display":{
+           "title_placeholder":"Quantité",
+           "message_disable":1
+        },
+        "isVisible":0,
+        "logicalId":"addx"
+     },
+     {
+        "name":"Enlever une quantité",
+        "type":"action",
+        "subtype":"message",
+        "display":{
+           "title_placeholder":"Quantité",
+           "message_disable":1
+        },
+        "isVisible":0,
+        "logicalId":"minusx"
+     }
+  ]
+}

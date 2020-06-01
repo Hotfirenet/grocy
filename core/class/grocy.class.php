@@ -53,6 +53,27 @@ class grocy extends eqLogic {
     public static function cronDaily() {
         grocy::buildGrocyCache();
     }
+
+    /*
+    * CE N'EST PAS BEAU DE REGARDER DANS LE CODE Mr Lunarok
+    */
+    public static function grocyEqLogic() {
+
+        $eqLogic = grocy::byLogicalId('instance', 'grocy');
+        if ( ! is_object( $eqLogic ) ) {
+
+            $eqLogic = new grocy();
+            $eqLogic->setEqType_name('grocy');
+            $eqLogic->setLogicalId('instance');
+            $eqLogic->setIsEnable(1);
+            $eqLogic->setIsVisible(0);
+            $eqLogic->setName('Grocy');
+
+            $eqLogic->save();
+        }
+
+        $eqLogic->createCmd( 'grocy' );
+    }
     
     public static function grocyExtend( $_eqLogic, $do = null, $_data = null ) {
 
@@ -226,9 +247,7 @@ class grocy extends eqLogic {
                     $eqLogic->setIsVisible(0);
                     $eqLogic->save();
     
-                    self::createCmd( $eqLogic->getId(), 'add1', 'action', 'Ajouter', 'other', '1', '<i class="fas fa-plus"></i>' );
-                    self::createCmd( $eqLogic->getId(), 'minus1', 'action', 'Enlever', 'other', '1', '<i class="fas fa-minus"></i>');                           
-                    self::createCmd( $eqLogic->getId(), 'stock', 'stock', 'Stock actuel', 'numeric', '1', 'line' );
+                    $eqLogic->createCmd( 'products-tmp' );
     
                     self::grocyExtend( $eqLogic, 'save' );
 
@@ -261,13 +280,18 @@ class grocy extends eqLogic {
     }
 
     public static function syncGrocy() {
+
+        self::grocyEqLogic();
+        self::buildGrocyCache();
+        self::syncBatteries();
         
         if( self::createLocationsInJeedom() ) {
             if( self::createProductsInJeedom() ) {
-                self::buildGrocyCache();
-                self::createGrocyShoppingLists();
-                self::syncBatteries();
-                return self::syncAllProductsStock();
+                if( self::createGrocyShoppingLists() ) {
+                    return self::syncAllProductsStock();
+                } else {
+                    return false;
+                }
             } else {
                 return false;
             }
@@ -332,36 +356,59 @@ class grocy extends eqLogic {
 
     public static function syncBatteries() {
 
-        foreach ( eqLogic::all() as $eqLogic ) {
+        if( (bool)config::byKey('batteries_sync','grocy') ) {
 
-            if( ! empty( $eqLogic->getStatus('battery') ) ) {
+            $url             = config::byKey('url','grocy');
+            $apikey          = config::byKey('apikey','grocy');
+    
+            $http      = new grocyAPI($url, $apikey);
+            $batteries = $http->getBatteries();       
+    
+            foreach ( eqLogic::all() as $eqLogic ) {
+    
+                $haveBattery = $eqLogic->getStatus( 'battery', null );
 
-                log::add('grocy','debug', $eqLogic->getHumanName() . ' possède une batterie ' . $eqLogic->getStatus('battery') );
+                if( is_null( $haveBattery ) ) {
 
-                $id_battery = $eqLogic->getConfiguration( 'id_battery', null );
-                if( is_null( $id_battery ) ) {
+                    continue;
 
-                    $result = self::createBatteryInGrocy( array( 
-                        'name'        => $eqLogic->getEqType_name() . ' ' . $eqLogic->getName(),
-                        'description' => $eqLogic->getConfiguration('battery_type') . ' Level:' . $eqLogic->getStatus('battery'),
-                        'used_in'     => $eqLogic->getName()
-                    ));
-    
-                    if( isset( $result['error_message'] ) ) {
-    
-                        log::add('grocy','error','syncBatteries : ' . $result['error_message'] );
-                    }
-    
-                    if( isset( $result['created_object_id'] ) ) {
-    
-                        $eqLogic->setConfiguration( 'id_battery', $result['created_object_id'] );
-                        $eqLogic->save();
-                    }  
-                    
                 } else {
 
-                    log::add('grocy','debug',' je dois faire un update' );
- 
+                    $name = $eqLogic->getEqType_name() . ' ' . $eqLogic->getName();
+                    log::add('grocy','debug', $name . ' possède une batterie ' . $eqLogic->getStatus('battery') );
+
+                    foreach( $batteries as $battery ) {
+
+                        if( $battery['name'] == $name ) {
+
+                            log::add('grocy','debug','Je modifie la batterie : ' . $name );
+
+                            $result = self::updateBatteryInGrocy( array( 
+                                'id'        => $name,
+                                'description' => $eqLogic->getConfiguration('battery_type') . ' Level:' . $eqLogic->getStatus('battery')
+                            ));
+
+                            if( isset( $result['error_message'] ) ) {
+            
+                                log::add('grocy','error','syncBatteries : ' . $result['error_message'] );
+                            }                            
+
+                        } else {
+
+                            log::add('grocy','debug','Je creer la batterie : ' . $name );
+
+                            $result = self::createBatteryInGrocy( array( 
+                                'name'        => $name,
+                                'description' => $eqLogic->getConfiguration('battery_type') . ' Level:' . $eqLogic->getStatus('battery'),
+                                'used_in'     => $eqLogic->getName()
+                            ));
+            
+                            if( isset( $result['error_message'] ) ) {
+            
+                                log::add('grocy','error','createBatteryInGrocy  : ' . $result['error_message'] );
+                            }
+                        }
+                    }    
                 }
             }
         }
@@ -608,6 +655,35 @@ class grocy extends eqLogic {
         cache::set('grocy::cache', $cache);
     }
 
+    public static function makeUrl() {
+
+        try {
+
+            $url = config::byKey('protocol','grocy') . '://' . config::byKey('ip_tld','grocy');
+
+            if ( substr( $url, -1, 1 ) == '/') {
+                $url = substr($url, 0, -1);
+            }
+    
+            $port = config::byKey('port','grocy', '');
+    
+            if ( ! empty( $port ) ) {
+                $url .= ':' . $port;
+            }
+    
+            $folder = config::byKey('folder','grocy', '');
+    
+            if ( empty( $folder ) ) {
+                $url .= '/' . $folder;
+            }
+    
+            return $url;
+
+        } catch (\Throwable $th) {
+
+            return false;
+        }
+    }
 
     /*     * *********************Méthodes d'instance************************* */
 
@@ -851,60 +927,69 @@ class grocy extends eqLogic {
 
         $http                = new grocyAPI($url, $apikey);
         
-        return is_json( $http->createBattery( $_data ), array() );;
+        return is_json( $http->createBattery( $_data ), array() );
     }
 
-    private function updateBatteryInGrocy() {
+    private function updateBatteryInGrocy( $_data ) {
 
+        $url                 = config::byKey('url','grocy');
+        $apikey              = config::byKey('apikey','grocy');
+
+        $http                = new grocyAPI($url, $apikey);
+        
+        return is_json( $http->updateBattery( $_data ), array() );
     }
 
-    private function createCmd( $_type ) {
+    private function createCmd( $_type, $_replace = null ) {
 
-        log::add('grocy','debug','Lancement de la création de commande pour le type : ' . $_type );
+        log::add('ondilo','debug','Lancement de la création de commande pour le type : ' . $_type );
 
         $file = dirname(__FILE__) . '/../config/templates/' . $_type . '.json';
 
-                $templateCmd = is_json( file_get_contents( $file ), array() );
+        $templateCmd = is_json( file_get_contents( $file ), array() );
 
-                if ( is_array( $templateCmd ) ) {
+        if ( is_array( $templateCmd ) ) {
 
-                    if( isset( $templateCmd['commands'] ) ) {
+            if( isset( $templateCmd['commands'] ) ) {
 
-                        foreach ( $templateCmd['commands'] as $command ) {
+                foreach ( $templateCmd['commands'] as $command ) {
 
-                            $cmd = new grocyCmd();
-                            $cmd->setName( __( $_name, __FILE__ ) );
-                            $cmd->setEqLogic_id( $_eqLogic_id );
-                            $cmd->setEqType( 'grocy' );
-                            $cmd->setLogicalId( $_logicalId );
+                    if( ! is_null( $_replace ) ) {
 
-                            $cmd = $this->getCmd( null, $command['logicalId'] );
-                            
-                            log::add('grocy','debug','getCmd:'. print_r($cmd, true));
+                        foreach( $command['configuration'] as $key => $value ) {
 
-                            if ($cmd == null || !is_object( $cmd )) {
-
-                                $cmd = new grocyCmd();
-                                $cmd->setEqLogic_id( $this->getId() );
-                        
-                                try {
-
-                                    utils::a2o( $cmd, $command);
-                                    $cmd->save();
-    
-                                } catch (Exception $e) {
-                    
-                                    log::add('grocy','error','e : ' . print_r($e, true) );
-                                }
+                            if( empty( $_replace[$value] ) ) {
+                                continue;
                             }
+
+                            $command['configuration'][$key] = $_replace[$value];
                         }
-
-                        return true;
-
-                    } else {
-                        log::add('grocy','debug','Aucune commandes trouvées');
                     }
-                } 
+
+                    $cmd = $this->getCmd( null, $command['logicalId'] );
+
+                    if ($cmd == null || !is_object( $cmd )) {
+
+                        log::add('ondilo','debug','Création commande:'.$command['logicalId']);
+
+                        $cmd = new ondiloCmd();
+                        $cmd->setEqLogic_id( $this->getId() );
+                
+                        try {
+
+                            utils::a2o( $cmd, $command);
+                            $cmd->save();
+
+                        } catch (Exception $e) {
+            
+                            log::add('ondilo','error','e : ' . print_r($e, true) );
+                        }
+                    }
+                }
+
+                return true;
+            }
+        } 
                 
         return false;
     }

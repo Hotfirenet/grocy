@@ -25,10 +25,22 @@ if (!isConnect()) {
 <form class="form-horizontal">
     <fieldset>
         <div class="form-group">
-            <label class="col-lg-4 control-label">{{Grocy URL}}</label>
+            <label class="col-lg-4 control-label">{{Grocy URL}} 
+				<sup><i class="fas fa-question-circle tooltips" title="{{Le dossier est facultatif}}"></i></sup>
+			</label>
             <div class="col-lg-8">
-                <input class="configKey form-control" data-l1key="url" />
-            </div>
+				<div class="input-group">
+					<select class="configKey tooltips form-control" data-l1key="protocol">
+						<option value='https'>{{HTTPS}}</option>
+						<option value='http' selected>{{HTTP}}</option>
+					</select>
+					<span class="input-group-addon">://</span>
+					<input type="text" class="configKey tooltips form-control" data-l1key="ip_tld" placeholder="{{IP ou Nom de domaine}}"/>
+					<span class="input-group-addon">:</span>
+					<input type="text" class="configKey tooltips form-control" data-l1key="port" placeholder="{{Port (Optionnel)}}"/>
+					<span class="input-group-addon">/</span>
+					<input type="text" class="configKey tooltips form-control" data-l1key="folder" placeholder="{{Dossier (Optionnel)}}"/>
+            	</div>
         </div>
         <div class="form-group">
             <label class="col-lg-4 control-label">{{Grocy API KEY}}</label>
@@ -58,6 +70,18 @@ if (!isConnect()) {
 			</div>
 		</div>
 		<div class="form-group">
+            <label class="col-lg-4 control-label">{{Objet par défaut}}</label>
+            <div class="col-lg-8">
+			<select id="sel_defaultObject" class="configKey form-control" data-l1key="default_object">
+			  <?php
+				foreach (jeeObject::all() as $object) {
+				  echo '<option value="' . $object->getId() . '">' . $object->getName() . '</option>';
+				}
+			  ?>
+			</select>
+            </div>
+        </div>
+		<div class="form-group">
             <label class="col-lg-4 control-label">{{Temps actif du mode C ou O}}</label>
             <div class="col-lg-8">
                 <input class="configKey form-control" data-l1key="time_mode" />
@@ -82,6 +106,18 @@ if (!isConnect()) {
 				<label class="radio-inline"><input type="radio" name="rd_type_mode_sync" class="configKey" data-l1key="type_mode_sync" data-l2key="diff"> {{Différé}}</label>
             </div>
         </div>
+		<div class="form-group">
+            <label class="col-lg-4 control-label" for="custom_widget">{{Activer la synchronisation des batteries}}</label>
+            <div class="col-lg-8">
+                <input id="custom_widget" type="checkbox" class="configKey form-control" data-l1key="batteries_sync" />
+            </div>
+        </div>
+		<div class="form-group">
+            <label class="col-lg-4 control-label" for="custom_widget">{{Activer la gestion des batteries}}</label>
+            <div class="col-lg-8">
+                <input id="custom_widget" type="checkbox" class="configKey form-control" data-l1key="batteries_management" />
+            </div>
+        </div>
   </fieldset>
 </form>
 <?php 
@@ -91,30 +127,51 @@ if (!isConnect()) {
 // }
 ?>
 <script type="text/javascript">
-$('.bt_selectWarnMeCmd').on('click', function () {
-  jeedom.cmd.getSelectModal({cmd: {type: 'action', subType: 'message'}}, function (result) {
-    $('.grocyNotifAttr[data-l1key="notif_cmd"]').value(result.human);
-  });
-});
 
-$('#bt_checkGrocyInstance').on('click', function () {
-	$.ajax({
-		type: "POST",
-		url: "plugins/grocy/core/ajax/grocy.ajax.php",
-		data: {
-			action: "checkGrocyInstance",
-		},
-		dataType: 'json',
-		error: function (request, status, error) {
-			handleAjaxError(request, status, error);
-		},
-		success: function (data) {
-			if (data.state != 'ok') {
-				$('#div_alertPluginConfiguration').showAlert({message: data.result, level: 'danger'});
-				return;
+	function grocy_postSaveConfiguration(){
+		$.ajax({
+			type: "POST",
+			url: "plugins/grocy/core/ajax/grocy.ajax.php",
+			data: {
+				action: "makeUrl",
+			},
+			dataType: 'json',
+			error: function (request, status, error) {
+				handleAjaxError(request, status, error);
+			},
+			success: function (data) {
+				if (data.state != 'ok') {
+					$('#div_alert').showAlert({message: data.result, level: 'danger'});
+					return;
+				}
 			}
-			$('#div_alertPluginConfiguration').showAlert({message: '{{Connexion ok.}}', level: 'success'});
-		}
+		});
+	};
+
+	$('.bt_selectWarnMeCmd').on('click', function () {
+	jeedom.cmd.getSelectModal({cmd: {type: 'action', subType: 'message'}}, function (result) {
+		$('.grocyNotifAttr[data-l1key="notif_cmd"]').value(result.human);
 	});
-});
+	});
+
+	$('#bt_checkGrocyInstance').on('click', function () {
+		$.ajax({
+			type: "POST",
+			url: "plugins/grocy/core/ajax/grocy.ajax.php",
+			data: {
+				action: "checkGrocyInstance",
+			},
+			dataType: 'json',
+			error: function (request, status, error) {
+				handleAjaxError(request, status, error);
+			},
+			success: function (data) {
+				if (data.state != 'ok') {
+					$('#div_alertPluginConfiguration').showAlert({message: data.result, level: 'danger'});
+					return;
+				}
+				$('#div_alertPluginConfiguration').showAlert({message: '{{Connexion ok.}}', level: 'success'});
+			}
+		});
+	});
 </script>
