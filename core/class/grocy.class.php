@@ -942,7 +942,7 @@ class grocy extends eqLogic {
 
     private function createCmd( $_type, $_replace = null ) {
 
-        log::add('ondilo','debug','Lancement de la création de commande pour le type : ' . $_type );
+        log::add('grocy','debug','Lancement de la création de commande pour le type : ' . $_type );
 
         $file = dirname(__FILE__) . '/../config/templates/' . $_type . '.json';
 
@@ -970,9 +970,9 @@ class grocy extends eqLogic {
 
                     if ($cmd == null || !is_object( $cmd )) {
 
-                        log::add('ondilo','debug','Création commande:'.$command['logicalId']);
+                        log::add('grocy','debug','Création commande:'.$command['logicalId']);
 
-                        $cmd = new ondiloCmd();
+                        $cmd = new grocyCmd();
                         $cmd->setEqLogic_id( $this->getId() );
                 
                         try {
@@ -982,7 +982,7 @@ class grocy extends eqLogic {
 
                         } catch (Exception $e) {
             
-                            log::add('ondilo','error','e : ' . print_r($e, true) );
+                            log::add('grocy','error','e : ' . print_r($e, true) );
                         }
                     }
                 }
